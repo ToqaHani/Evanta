@@ -1,5 +1,8 @@
+import "./App.css";
+import Guests from "./pages/Guests/Guests";
+
 function App() {
-  return <></>;
+  return <Guests />;
 }
 
 export default App;
