@@ -1,9 +1,13 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const app = express();
-// -------------connection------------- //
+require('dotenv').config();
+require('./config/db');
 app.use(express.json());
-let port = 3000;
+const expenseRoutes = require('./routes/expenseRoutes');
+const invitationsRoutes = require('./routes/invitationsRoutes');
+app.use('/api/budget', expenseRoutes)
+app.use('/api/invitations', invitationsRoutes)
+let port = process.env.PORT;
 app.listen(port, () => {
     console.log(`Server is running on port ${port} 🚀`);
 })
