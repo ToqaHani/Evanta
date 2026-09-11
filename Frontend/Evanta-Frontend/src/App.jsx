@@ -1,5 +1,7 @@
+import VendorsPage from "./pages/VendorsPage";
+
 function App() {
-  return <></>;
+  return <VendorsPage />;
 }
 
 export default App;
