@@ -1,7 +1,6 @@
 import { useState } from "react";
-function InvitationLink({ imgFile }) {
-  let link = `https://google.com`;
-
+function InvitationLink({ imgFile, imageUrl, invitationUrl }) {
+  let link = invitationUrl;
   let [labelContent, setLabelContent] = useState("Copy Link");
   // بظبط ال label اللي على البوتون
   function handleLableContent() {
@@ -21,7 +20,7 @@ function InvitationLink({ imgFile }) {
     <>
       <div className="content p-4">
         <h3>Invitation Link</h3>
-        {imgFile ? (
+        {imgFile || imageUrl ? (
           <p>Share this link with your guests</p>
         ) : (
           <p>Please Upload your invitation to create your invitation link.</p>
@@ -31,14 +30,14 @@ function InvitationLink({ imgFile }) {
           style={{
             border: "1px solid var(--color-brown)",
             borderRadius: "8px",
-            visibility: imgFile ? "visible" : "hidden",
+            visibility: imgFile || imageUrl ? "visible" : "hidden",
           }}
         >
           {link}
         </span>
         <button
           onClick={handleCopy}
-          disabled={!imgFile}
+          disabled={!imgFile && !imageUrl}
           className={`mt-4 ${labelContent === "Copied!" ? "copied" : ""}`}
         >
           {labelContent}

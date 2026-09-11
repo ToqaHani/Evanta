@@ -1,6 +1,12 @@
 import { useRef } from "react";
 import { FaArrowUpFromBracket } from "react-icons/fa6";
-function InvitationImg({ imgFile, setImgFile }) {
+function InvitationImg({
+  imgFile,
+  setImgFile,
+  handleUpload,
+  handleDelete,
+  imageUrl,
+}) {
   // علشان اتحكم في القيمة اللي في الانبوت ساعة المسح
   let inputRef = useRef(null);
 
@@ -11,13 +17,14 @@ function InvitationImg({ imgFile, setImgFile }) {
       setImgFile(null);
     } else {
       setImgFile(file);
+      handleUpload(file);
     }
   }
 
   // بتحكم في مسح الصورة و ال label
   function handleRemove() {
     inputRef.current.value = null;
-    setImgFile(null);
+    handleDelete();
   }
 
   return (
@@ -34,11 +41,11 @@ function InvitationImg({ imgFile, setImgFile }) {
             onChange={handleInput}
             ref={inputRef}
           />
-          {imgFile ? (
+          {imgFile || imageUrl ? (
             <>
               <img
-                src={URL.createObjectURL(imgFile)}
-                alt={imgFile.name}
+                src={imgFile ? URL.createObjectURL(imgFile) : imageUrl}
+                alt="Invitation"
                 style={{
                   maxWidth: "100%",
                   maxHeight: "300px",
@@ -63,7 +70,7 @@ function InvitationImg({ imgFile, setImgFile }) {
         <button
           className="mt-4 mx-auto d-flex align-items-center justify-content-center"
           onClick={handleRemove}
-          disabled={!imgFile}
+          disabled={!imgFile && !imageUrl}
         >
           Remove Image
         </button>

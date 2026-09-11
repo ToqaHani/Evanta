@@ -1,6 +1,6 @@
 import { QRCodeCanvas } from "qrcode.react";
-function InvitationQR({ imgFile }) {
-  let link = "https://google.com";
+function InvitationQR({ imgFile, imageUrl, invitationUrl }) {
+  let link = invitationUrl;
 
   const downloadQR = () => {
     const canvas = document.getElementById("qr-code");
@@ -17,7 +17,7 @@ function InvitationQR({ imgFile }) {
     <>
       <div className="content p-4">
         <h3>Invitation QR</h3>
-        {imgFile ? (
+        {imgFile || imageUrl ? (
           <p>Scan to open invitation</p>
         ) : (
           <p>Please Upload your invitation to create your invitation QR Code</p>
@@ -26,9 +26,13 @@ function InvitationQR({ imgFile }) {
           id="qr-code"
           value={link}
           size={200}
-          style={{ visibility: imgFile ? "visible" : "hidden" }}
+          style={{ visibility: imgFile || imageUrl ? "visible" : "hidden" }}
         />
-        <button className="mt-4" disabled={!imgFile} onClick={downloadQR}>
+        <button
+          className="mt-4"
+          disabled={!imgFile && !imageUrl}
+          onClick={downloadQR}
+        >
           Download QR Code
         </button>
       </div>
