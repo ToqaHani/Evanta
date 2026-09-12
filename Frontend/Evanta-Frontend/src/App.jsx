@@ -1,7 +1,6 @@
-import VendorsPage from "./pages/VendorsPage";
-
+import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
+import './pages/invitations/invitations.css'
 function App() {
-  return <VendorsPage />;
+  return null;
 }
-
 export default App;
