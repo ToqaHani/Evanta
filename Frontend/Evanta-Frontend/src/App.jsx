@@ -1,11 +1,6 @@
-import Invitation from "./pages/Public-Invitation/Public-invitationComponents/invitation";
-import './pages/Public-Invitation/Public-invitation.css'
+import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
+import './pages/invitations/invitations.css'
 function App() {
-  return <>
-  <div className="d-flex align-content-center justify-content-center">
-    <Invitation/>
-  </div>
-  </>;
+  return null;
 }
-
 export default App;
