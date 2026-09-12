@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "cloudinary": "^2.11.0",
     "multer": "^2.3.0",
     "qrcode.react": "^4.2.0",
