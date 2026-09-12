@@ -1,7 +1,8 @@
-import Dashboard from "./pages/Public-dashboard/Dashboard";
-
+import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
+import './pages/invitations/invitations.css'
 function App() {
-  return <Dashboard />;
+  return <>
+  <InvitationBody/>
+  </>;
 }
-
 export default App;
