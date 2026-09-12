@@ -5,6 +5,7 @@ const {
   createGuest,
   updateGuest,
   deleteGuest,
+  updateGuestStatus,
 } = require("../controllers/guestController");
 
 const router = express.Router();
@@ -16,5 +17,7 @@ router.post("/events/:eventId/guests", createGuest);
 router.put("/guests/:guestId", updateGuest);
 
 router.delete("/guests/:guestId", deleteGuest);
+
+router.patch("/events/:eventId/guests/status", updateGuestStatus);
 
 module.exports = router;

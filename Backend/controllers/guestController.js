@@ -78,9 +78,41 @@ const deleteGuest = async (req, res) => {
   }
 };
 
+const updateGuestStatus = async (req, res) => {
+  try {
+    const { phone, status } = req.body;
+
+    const guest = await Guest.findOneAndUpdate(
+      {
+        eventId: req.params.eventId,
+        phone,
+      },
+      { status },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!guest) {
+      return res.status(404).json({
+        message: "Guest not found",
+      });
+    }
+
+    res.status(200).json(guest);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update guest status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getGuests,
   createGuest,
   updateGuest,
   deleteGuest,
+  updateGuestStatus
 };
