@@ -8,6 +8,10 @@ const invitationsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    publicId: {
+        type: String,
+        required: true
+    },
     invitationUrl: {
         type: String,
         required: true
