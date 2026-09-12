@@ -1,9 +1,6 @@
-import BudgetBody from "./pages/Budget/budgetComponents/BudgetBody";
-import './pages/Budget/Budget.css'
+import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
+import './pages/invitations/invitations.css'
 function App() {
-  return <>
-  <BudgetBody/>
-  </>;
+  return null;
 }
-
 export default App;
