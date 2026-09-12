@@ -29,10 +29,11 @@ body {
   background-color: var(--color-beige);
   color: var(--color-dark-brown);
 }
-
+p,
 label {
   font-weight: 600;
   color: var(--color-brown);
+  font-size:large;
 }
 .page {
   position: fixed;

@@ -5,6 +5,7 @@ import photo from "../../../assets/Beige And Gold Floral Wedding Invitation.png"
 import { FaCircleCheck } from "react-icons/fa6";
 function Invitation() {
   const { eventId } = useParams();
+  let [phoneError, setPhoneError] = useState("");
   let [phone, setPhone] = useState("");
   // بغير حالة ال geust على حسب اللي اختاره
   let [status, setStatus] = useState("Pending");
@@ -65,7 +66,7 @@ function Invitation() {
       )}
       <div className="content m-5 p-2 p-sm-5 d-flex flex-column justify-content-center align-items-center">
         <img src={photo} alt="invitation" className="invitation-img" />
-        <div className="d-flex flex-column justify-content-center align-items-center p-3">
+        <div className="d-flex flex-column justify-content-center align-items-center p-3 gap-3">
           <label htmlFor="phone">Please, Enter your phone number:</label>
           <input
             type="text"
@@ -74,11 +75,24 @@ function Invitation() {
             maxLength={11}
             onChange={(e) => {
               const value = e.target.value;
+
               if (/^\d*$/.test(value)) {
                 setPhone(value);
+
+                if (
+                  value.length === 11 &&
+                  !/^(010|011|012|015)\d{8}$/.test(value)
+                ) {
+                  setPhoneError("Please enter a valid Egyptian phone number.");
+                } else {
+                  setPhoneError("");
+                }
               }
             }}
           />
+          {phoneError && (
+            <p style={{ color: "var(--color-red)" }}>{phoneError}</p>
+          )}
         </div>
         <div className="d-flex flex-column flex-sm-row mt-4 gap-3 justify-content-center align-items-center">
           <button
