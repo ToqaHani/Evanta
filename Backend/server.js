@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
+const authRoutes = require('./routes/authRoutes')
 const guestRoutes = require("./routes/guestRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRoutes)
 app.use("/api", guestRoutes);
 app.use("/api", taskRoutes);
 app.use("/api/budget", expenseRoutes);
