@@ -2,16 +2,16 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./pages/Landing/LandingComponents/Navbar";
 import Landing from "./pages/Landing/LandingComponents/Landing";
 import Footer from "./pages/Landing/LandingComponents/Footer";
-
 import Login from "./pages/Login&Register/loginComponents/Login";
 import Register from "./pages/Login&Register/loginComponents/Register";
+import CreateEvent from "./pages/Create-Event/create-eventComponents/createEvent";
 
 import Dashboard from "./pages/Public-dashboard/Dashboard";
 import GuestsBody from "./pages/Guests/GuestsComponents/GuestsBody";
 import BudgetBody from "./pages/Budget/budgetComponents/BudgetBody";
 
+
 import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
-import CreateEvent from "./pages/Create-Event/create-eventComponents/createEvent";
 import MyEvents from "./pages/My-Events/My-EventsComponents/MyEvents";
 
 function App() {

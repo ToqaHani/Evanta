@@ -24,7 +24,7 @@ export default function CreateEvent() {
     setSuccess("");
   };
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
 
     if (!form.eventType) {
@@ -32,9 +32,18 @@ export default function CreateEvent() {
       return;
     }
 
-    addEvent(form);
-    setForm(initial);
-    setSuccess("Event created successfully.");
+    try {
+      await addEvent(form);
+
+      setForm(initial);
+      setSuccess("Event created successfully.");
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create event.",
+      );
+    }
   };
 
   return (
@@ -50,7 +59,9 @@ export default function CreateEvent() {
         <section className="create-event-shell fade-up">
           <div className="create-event-heading">
             <span className="evanta-eyebrow">Plan it your way</span>
+
             <h1 className="evanta-title mt-2 mb-2">Create Your Event</h1>
+
             <p className="evanta-muted mb-0">
               Let's start with the basic information about your event.
             </p>
@@ -91,6 +102,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="eventName">
                   Event Name
                 </label>
+
                 <input
                   id="eventName"
                   className="evanta-input"
@@ -105,6 +117,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="date">
                   Date
                 </label>
+
                 <input
                   id="date"
                   type="date"
@@ -119,6 +132,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="time">
                   Time
                 </label>
+
                 <input
                   id="time"
                   type="time"
@@ -133,6 +147,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="location">
                   Location
                 </label>
+
                 <input
                   id="location"
                   className="evanta-input"
@@ -147,6 +162,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="guests">
                   Expected Guests
                 </label>
+
                 <input
                   id="guests"
                   type="number"
@@ -163,6 +179,7 @@ export default function CreateEvent() {
                 <label className="evanta-label" htmlFor="budget">
                   Budget
                 </label>
+
                 <input
                   id="budget"
                   type="number"
@@ -192,6 +209,7 @@ export default function CreateEvent() {
               <button type="button" className="btn-evanta btn-evanta-ghost">
                 Cancel
               </button>
+
               <button type="submit" className="btn-evanta btn-evanta-solid">
                 Create Event
               </button>
