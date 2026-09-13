@@ -12,9 +12,10 @@
   "dependencies": {
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
-    "chart.js": "^4.5.1",
     "bootstrap-icons": "^1.13.1",
+    "chart.js": "^4.5.1",
     "cloudinary": "^2.11.0",
+    "lucide-react": "^1.45.0",
     "multer": "^2.3.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
