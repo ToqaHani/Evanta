@@ -1,9 +1,20 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
 const connectDB = require("./config/db");
 
 const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  }),
+);
 
 app.use(express.json());
 

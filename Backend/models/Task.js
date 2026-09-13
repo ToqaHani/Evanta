@@ -13,6 +13,12 @@ const taskSchema = new mongoose.Schema(
       trim: true,
     },
 
+    assignedTo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     description: {
       type: String,
       default: "",
@@ -38,7 +44,7 @@ const taskSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Task", taskSchema);
