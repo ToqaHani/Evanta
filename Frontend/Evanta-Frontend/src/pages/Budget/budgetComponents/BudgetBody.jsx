@@ -2,6 +2,7 @@ import BudgetCards from "./BudgetCards";
 import BudgetOverview from "./BudgetOverview";
 import RecentExpenses from "./RecentExpenses";
 import { useState } from "react";
+import '../Budget.css'
 function BudgetBody() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [popUpType, setPopUpType] = useState("");
@@ -32,7 +33,7 @@ function BudgetBody() {
           <RecentExpenses
             expenses={expenses}
             setExpenses={setExpenses}
-            eventId={eventId}
+            // eventId={eventId}
             showPopUp={showPopUp}
             setShowPopUp={setShowPopUp}
             popUpType={popUpType}

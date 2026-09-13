@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
-const authRoutes = require('./routes/authRoutes')
+const authRoutes = require('./routes/userRoutes')
 const guestRoutes = require("./routes/guestRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");

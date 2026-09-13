@@ -3,6 +3,7 @@ import InvitationImg from "./InvitationImg";
 import InvitationLink from "./InvitationLink";
 import InvitationQR from "./InvitationQR";
 import axios from "axios";
+import '../invitations.css'
 function InvitationBody() {
   // فايل الصورة علشان احطه في ال event invitation
   let [imgFile, setImgFile] = useState(null);
