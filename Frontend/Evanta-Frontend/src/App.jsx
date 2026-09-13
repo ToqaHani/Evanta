@@ -10,7 +10,7 @@ import Dashboard from "./pages/Public-dashboard/Dashboard";
 import GuestsBody from "./pages/Guests/GuestsComponents/GuestsBody";
 import BudgetBody from "./pages/Budget/budgetComponents/BudgetBody";
 
-import VendorsPage from "./pages/Vendors/VendorsComponents/VendorsPage";
+
 import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
 
 function App() {
