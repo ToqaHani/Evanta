@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../../assets/logo.png";
-import "./Footer.css";
+import "../Footer.css";
 
 export default function Footer() {
   const location = useLocation();

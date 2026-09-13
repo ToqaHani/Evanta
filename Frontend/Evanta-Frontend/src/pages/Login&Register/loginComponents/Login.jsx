@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
-import "./Auth.css";
+import logo from "../../../assets/logo.png";
+import "../Auth.css";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
