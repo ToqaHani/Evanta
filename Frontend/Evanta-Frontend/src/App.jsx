@@ -1,6 +1,7 @@
-import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
-import './pages/invitations/invitations.css'
+import GuestsBody from "./pages/Guests/GuestsComponents/GuestsBody";
+
 function App() {
-  return null;
+  return <GuestsBody />;
 }
+
 export default App;
