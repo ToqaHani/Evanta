@@ -1,7 +1,8 @@
-import Sidebar from "./components/public-sidebar/Sidebar";
-
+import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
+import './pages/invitations/invitations.css'
 function App() {
-  return <Sidebar />;
+  return <>
+  <InvitationBody/>
+  </>;
 }
-
 export default App;
