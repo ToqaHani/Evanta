@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const STORAGE_KEY = "evanta_events";
-
 export const EVENT_TYPES = [
     "Birthday",
     "Engagement",
@@ -11,39 +9,25 @@ export const EVENT_TYPES = [
     "Other",
 ];
 
-export function isBrowser() {
-    return typeof window !== "undefined";
-}
+export async function getEvents() {
+    const token =
+        localStorage.getItem("evantaToken") ||
+        sessionStorage.getItem("evantaToken");
 
-export function getEvents() {
-    if (!isBrowser()) return [];
-
-    try {
-        const raw = window.localStorage.getItem(STORAGE_KEY);
-
-        if (!raw) return [];
-
-        const parsed = JSON.parse(raw);
-
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
+    if (!token) {
+        throw new Error("User is not logged in");
     }
-}
 
-function saveEvents(events) {
-    if (!isBrowser()) return;
-
-    window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(events)
+    const response = await axios.get(
+        "http://localhost:3000/api/events",
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
-}
 
-export function createId() {
-    return `evt_${Date.now().toString(36)}_${Math.random()
-        .toString(36)
-        .slice(2, 8)}`;
+    return response.data;
 }
 
 export async function addEvent(event) {
@@ -78,33 +62,88 @@ export async function addEvent(event) {
         }
     );
 
-    return response.data;
+    return response.data.event;
 }
 
-export function updateEvent(event) {
-    const next = getEvents().map((item) =>
-        item.eventId === event.eventId ? event : item
+export async function updateEvent(event) {
+    const token =
+        localStorage.getItem("evantaToken") ||
+        sessionStorage.getItem("evantaToken");
+
+    if (!token) {
+        throw new Error("User is not logged in");
+    }
+
+    const eventData = {
+        name: event.name ?? event.eventName,
+        type:
+            event.eventType === "Other"
+                ? event.customEventType
+                : event.type ?? event.eventType,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        expectedGuests: Number(event.expectedGuests),
+        budget: Number(event.budget),
+    };
+
+    const response = await axios.put(
+        `http://localhost:3000/api/events/${event._id}`,
+        eventData,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
 
-    saveEvents(next);
-
-    return next;
+    return response.data.event;
 }
 
-export function deleteEvent(eventId) {
-    const next = getEvents().filter(
-        (item) => item.eventId !== eventId
+export async function deleteEvent(eventId) {
+    const token =
+        localStorage.getItem("evantaToken") ||
+        sessionStorage.getItem("evantaToken");
+
+    if (!token) {
+        throw new Error("User is not logged in");
+    }
+
+    const response = await axios.delete(
+        `http://localhost:3000/api/events/${eventId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
     );
 
-    saveEvents(next);
-
-    return next;
+    return response.data.event;
 }
 
+export async function saveSmartPlan(eventId, data) {
+    const token =
+        localStorage.getItem("evantaToken") ||
+        sessionStorage.getItem("evantaToken");
+
+    if (!token) {
+        throw new Error("User is not logged in");
+    }
+
+    const response = await axios.put(
+        `http://localhost:3000/api/events/${eventId}/smart-plan`,
+        data,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data.event;
+}
 export function displayType(event) {
-    return event.eventType === "Other" && event.customEventType
-        ? event.customEventType
-        : event.eventType;
+    return event.type || "—";
 }
 
 export function formatMoney(value) {

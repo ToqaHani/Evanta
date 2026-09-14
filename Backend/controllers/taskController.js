@@ -1,10 +1,11 @@
 const Task = require("../models/Task");
 
+// Get all tasks for an event
 const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({
       eventId: req.params.eventId,
-    });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json(tasks);
   } catch (error) {
@@ -15,9 +16,11 @@ const getTasks = async (req, res) => {
   }
 };
 
+// Create a new task
 const createTask = async (req, res) => {
   try {
-    const { title, description, dueDate, status, priority } = req.body;
+    const { title, description, dueDate, status, priority, assignedTo } =
+      req.body;
 
     const task = await Task.create({
       eventId: req.params.eventId,
@@ -26,6 +29,7 @@ const createTask = async (req, res) => {
       dueDate,
       status,
       priority,
+      assignedTo,
     });
 
     res.status(201).json(task);
@@ -37,16 +41,13 @@ const createTask = async (req, res) => {
   }
 };
 
+// Update a task
 const updateTask = async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.taskId,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const task = await Task.findByIdAndUpdate(req.params.taskId, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!task) {
       return res.status(404).json({
@@ -63,6 +64,7 @@ const updateTask = async (req, res) => {
   }
 };
 
+// Delete a task
 const deleteTask = async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.taskId);

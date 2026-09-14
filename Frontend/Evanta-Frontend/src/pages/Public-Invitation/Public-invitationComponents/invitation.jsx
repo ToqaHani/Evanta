@@ -1,19 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import photo from "../../../assets/Beige And Gold Floral Wedding Invitation.png";
 import { FaCircleCheck } from "react-icons/fa6";
+
 function Invitation() {
   const { eventId } = useParams();
-  let [phoneError, setPhoneError] = useState("");
-  let [phone, setPhone] = useState("");
-  // بغير حالة ال geust على حسب اللي اختاره
-  let [status, setStatus] = useState("Pending");
-  //   بغير بيها لون الكلمة جوا المسدج
-  let [statusColor, setStatusColor] = useState("var(--color-dark-brown)");
-  //   بظهر بيها و بخفي المسدج اللي هتظهر
-  let [showMessage, setShowMessage] = useState(false);
-  // بخليه يغبر كل اللي فوق
+
+  const [invitationImage, setInvitationImage] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState("Pending");
+  const [statusColor, setStatusColor] = useState("var(--color-dark-brown)");
+  const [showMessage, setShowMessage] = useState(false);
+
+  useEffect(() => {
+    if (!eventId) return;
+
+    async function getInvitation() {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/invitations/${eventId}`,
+        );
+
+        setInvitationImage(response.data.invitation.imageUrl);
+      } catch (error) {
+        console.log(error.response?.data);
+      }
+    }
+
+    getInvitation();
+  }, [eventId]);
+
   async function handleClick(e) {
     const selectedStatus = e.target.name;
 
@@ -37,37 +54,47 @@ function Invitation() {
   return (
     <>
       {showMessage && (
-        <>
-          <div className="page p-2">
-            <div className="message">
-              <FaCircleCheck
-                size={"80px"}
-                style={{ color: "var(--color-green)" }}
-                className="my-2"
-              />
-              <h3 className="mt-2">Thank you!</h3>
-              <p className="mt-2">
-                Your response has been recorded as{" "}
-                <span style={{ color: statusColor }}>{status}</span>
-              </p>
-              <button
-                className="mt-3"
-                onClick={() => setShowMessage(false)}
-                style={{
-                  backgroundColor: "var(--color-green)",
-                  border: "1px solid var(--color-green)",
-                }}
-              >
-                Great!
-              </button>
-            </div>
+        <div className="page p-2">
+          <div className="message">
+            <FaCircleCheck
+              size={"80px"}
+              style={{ color: "var(--color-green)" }}
+              className="my-2"
+            />
+
+            <h3 className="mt-2">Thank you!</h3>
+
+            <p className="mt-2">
+              Your response has been recorded as{" "}
+              <span style={{ color: statusColor }}>{status}</span>
+            </p>
+
+            <button
+              className="mt-3"
+              onClick={() => setShowMessage(false)}
+              style={{
+                backgroundColor: "var(--color-green)",
+                border: "1px solid var(--color-green)",
+              }}
+            >
+              Great!
+            </button>
           </div>
-        </>
+        </div>
       )}
+
       <div className="content m-5 p-2 p-sm-5 d-flex flex-column justify-content-center align-items-center">
-        <img src={photo} alt="invitation" className="invitation-img" />
+        {invitationImage && (
+          <img
+            src={invitationImage}
+            alt="invitation"
+            className="invitation-img"
+          />
+        )}
+
         <div className="d-flex flex-column justify-content-center align-items-center p-3 gap-3">
           <label htmlFor="phone">Please, Enter your phone number:</label>
+
           <input
             type="text"
             id="phone"
@@ -90,10 +117,12 @@ function Invitation() {
               }
             }}
           />
+
           {phoneError && (
             <p style={{ color: "var(--color-red)" }}>{phoneError}</p>
           )}
         </div>
+
         <div className="d-flex flex-column flex-sm-row mt-4 gap-3 justify-content-center align-items-center">
           <button
             name="Confirmed"
@@ -106,6 +135,7 @@ function Invitation() {
           >
             Yes, I'll be there!
           </button>
+
           <button
             name="Maybe"
             style={{
@@ -117,8 +147,9 @@ function Invitation() {
           >
             Maybe
           </button>
+
           <button
-            name="Declined"
+            name="Not Coming"
             style={{
               backgroundColor: "var(--color-red)",
               border: "1px solid var(--color-red)",
@@ -133,4 +164,5 @@ function Invitation() {
     </>
   );
 }
+
 export default Invitation;

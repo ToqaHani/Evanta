@@ -3,7 +3,10 @@ const router = express.Router();
 
 const {
   getDashboard,
-} = require("../../controllers/dashboard-controllers/dashboardController");
+  createDashboard,
+  updateDashboard,
+  deleteDashboard,
+} = require("../controllers/dashboardController");
 
 // GET dashboard data for a specific event
 router.get("/:eventId/dashboard", getDashboard);

@@ -4,6 +4,7 @@ const taskSchema = new mongoose.Schema(
   {
     eventId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
       required: true,
     },
 
@@ -35,10 +36,16 @@ const taskSchema = new mongoose.Schema(
       enum: ["Low", "Medium", "High"],
       default: "Medium",
     },
+
+    assignedTo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Task", taskSchema);

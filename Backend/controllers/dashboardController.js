@@ -1,8 +1,4 @@
-const Event = require("../../models/eventModel");
-const Guest = require("../../models/Guest");
-const Task = require("../../models/Task");
-const Expense = require("../../models/expenseModel");
-
+const Dashboard = require("../models/Dashboard");
 // Helper: format event date
 const formatEventDate = (date) => {
   if (!date) return "";

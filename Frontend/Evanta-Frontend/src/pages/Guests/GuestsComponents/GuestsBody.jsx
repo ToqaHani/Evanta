@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { useEvent } from "../../../context/EventContext";
 import GuestsHeader from "./GuestsHeader";
 import GuestsSummary from "./GuestsSummary";
 import GuestsControls from "./GuestsControls";
@@ -9,8 +9,6 @@ import AddGuestModal from "./AddGuestModal";
 import "../Guests.css";
 
 const API_URL = "http://localhost:3000/api";
-
-const EVENT_ID = "507f1f77bcf86cd799439011";
 
 const emptyForm = {
   name: "",
@@ -27,12 +25,15 @@ function GuestsBody() {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [openActionId, setOpenActionId] = useState(null);
+  const { currentEvent } = useEvent();
+  const EVENT_ID = currentEvent?._id;
 
   // =========================
   // Get Guests
   // =========================
 
   useEffect(() => {
+    if (!EVENT_ID) return;
     const fetchGuests = async () => {
       try {
         const response = await fetch(`${API_URL}/events/${EVENT_ID}/guests`);
@@ -58,7 +59,7 @@ function GuestsBody() {
     };
 
     fetchGuests();
-  }, []);
+  }, [EVENT_ID]);
 
   // =========================
   // Input Change
