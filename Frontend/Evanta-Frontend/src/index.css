@@ -176,3 +176,51 @@ input:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+<<<<<<< HEAD
+/* =========================================
+   EVENT WORKSPACE + SIDEBAR LAYOUT
+   ========================================= */
+
+.workspace-main {
+  width: calc(100% - 272px);
+  min-height: 100vh;
+
+  margin-left: 272px;
+
+  box-sizing: border-box;
+}
+
+.public-main {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Tablet / Mobile */
+@media (max-width: 820px) {
+  .workspace-main {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+/* =========================================
+   EVENT WORKSPACE + SIDEBAR LAYOUT
+   ========================================= */
+
+.workspace-main {
+  width: calc(100% - 272px);
+  min-height: 100vh;
+  margin-left: 272px;
+  box-sizing: border-box;
+}
+
+.public-main {
+  width: 100%;
+  min-height: 100vh;
+}
+
+@media (max-width: 820px) {
+  .workspace-main {
+    width: 100%;
+    margin-left: 0;
+  }
+}
