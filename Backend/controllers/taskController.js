@@ -4,7 +4,7 @@ const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({
       eventId: req.params.eventId,
-    });
+    }).sort({ createdAt: -1 });
 
     res.status(200).json(tasks);
   } catch (error) {
@@ -17,11 +17,13 @@ const getTasks = async (req, res) => {
 
 const createTask = async (req, res) => {
   try {
-    const { title, description, dueDate, status, priority } = req.body;
+    const { title, assignedTo, description, dueDate, status, priority } =
+      req.body;
 
     const task = await Task.create({
       eventId: req.params.eventId,
       title,
+      assignedTo,
       description,
       dueDate,
       status,
@@ -39,14 +41,10 @@ const createTask = async (req, res) => {
 
 const updateTask = async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.taskId,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const task = await Task.findByIdAndUpdate(req.params.taskId, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!task) {
       return res.status(404).json({
