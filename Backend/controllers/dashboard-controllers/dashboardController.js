@@ -1,193 +1,273 @@
-const Dashboard = require("../../models/dashboard-models/Dashboard");
+const Event = require("../models/eventModel");
+const Guest = require("../models/Guest");
+const Task = require("../models/Task");
+const Expense = require("../models/expenseModel");
+
+// Helper: format event date
+const formatEventDate = (date) => {
+  if (!date) return "";
+
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+// Helper: calculate due text
+const getDueText = (date) => {
+  if (!date) return "";
+
+  const today = new Date();
+  const dueDate = new Date(date);
+
+  today.setHours(0, 0, 0, 0);
+  dueDate.setHours(0, 0, 0, 0);
+
+  const difference = dueDate - today;
+
+  const days = Math.ceil(
+    difference / (1000 * 60 * 60 * 24)
+  );
+
+  if (days < 0) {
+    return `${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} overdue`;
+  }
+
+  if (days === 0) {
+    return "Due today";
+  }
+
+  if (days === 1) {
+    return "Due tomorrow";
+  }
+
+  return `Due in ${days} days`;
+};
 
 // GET DASHBOARD
-// GET /api/events/:eventId/dashboard
 const getDashboard = async (req, res) => {
   try {
     const { eventId } = req.params;
 
-    const dashboard = await Dashboard.findOne({ eventId }).lean();
+    // -------------------------
+    // 1. GET EVENT
+    // -------------------------
 
-    if (!dashboard) {
+    const event = await Event.findById(eventId).lean();
+
+    if (!event) {
       return res.status(404).json({
-        message: "Dashboard not found for this event",
+        message: "Event not found",
       });
     }
 
-    const response = {
-      event: dashboard.event,
+    // -------------------------
+    // 2. GET RELATED DATA
+    // -------------------------
 
-      countdown: dashboard.countdown,
+    const [guests, tasks, expenses] = await Promise.all([
+      Guest.find({ eventId }).lean(),
 
-      stats: dashboard.stats,
+      Task.find({ eventId })
+        .sort({ dueDate: 1 })
+        .lean(),
 
-      guestOverview: dashboard.guestOverview,
+      Expense.find({ eventId })
+        .sort({ date: -1 })
+        .lean(),
+    ]);
 
-      budgetOverview: dashboard.budgetOverview,
+    // -------------------------
+    // 3. GUEST STATISTICS
+    // -------------------------
 
-      taskProgress: dashboard.taskProgress,
+    const confirmedGuests = guests.filter(
+      (guest) => guest.status === "Confirmed"
+    ).length;
 
-      upcoming: dashboard.upcoming.map((item) => ({
-        id: item._id,
-        title: item.title,
-        due: item.due,
-        tone: item.tone,
-      })),
+    const maybeGuests = guests.filter(
+      (guest) => guest.status === "Maybe"
+    ).length;
 
-      vendors: dashboard.vendors.map((vendor) => ({
-        id: vendor._id,
-        name: vendor.name,
-        booked: vendor.booked,
-      })),
+    const notComingGuests = guests.filter(
+      (guest) => guest.status === "Not Coming"
+    ).length;
 
-      activity: dashboard.activity.map((item) => ({
-        id: item._id,
-        text: item.text,
-        time: item.time,
-        icon: item.icon,
-      })),
-    };
+    const noResponseGuests = guests.filter(
+      (guest) => guest.status === "No Response"
+    ).length;
 
-    res.status(200).json(response);
-  } catch (error) {
-    console.error("Get dashboard error:", error);
+    // Event expectedGuests is used as the target
+    const totalExpectedGuests = event.expectedGuests || 0;
 
-    res.status(500).json({
-      message: "Failed to retrieve dashboard",
-      error: error.message,
-    });
-  }
-};
+    // -------------------------
+    // 4. TASK STATISTICS
+    // -------------------------
 
-// CREATE DASHBOARD
-// POST /api/events/:eventId/dashboard
-const createDashboard = async (req, res) => {
-  try {
-    const { eventId } = req.params;
+    const completedTasks = tasks.filter(
+      (task) => task.status === "Completed"
+    ).length;
 
-    const existingDashboard = await Dashboard.findOne({
-      eventId,
-    });
+    const totalTasks = tasks.length;
 
-    if (existingDashboard) {
-      return res.status(409).json({
-        message: "Dashboard already exists for this event",
-      });
-    }
+    // -------------------------
+    // 5. BUDGET STATISTICS
+    // -------------------------
 
-    const dashboard = await Dashboard.create({
-      ...req.body,
-      eventId,
+    const totalBudget = Number(event.budget) || 0;
 
-      event: {
-        ...req.body.event,
-        id: eventId,
-      },
-    });
-
-    res.status(201).json({
-      message: "Dashboard created successfully",
-      dashboard,
-    });
-  } catch (error) {
-    console.error("Create dashboard error:", error);
-
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Dashboard validation failed",
-        error: error.message,
-      });
-    }
-
-    res.status(500).json({
-      message: "Failed to create dashboard",
-      error: error.message,
-    });
-  }
-};
-
-// UPDATE DASHBOARD
-// PUT /api/events/:eventId/dashboard
-const updateDashboard = async (req, res) => {
-  try {
-    const { eventId } = req.params;
-
-    const updateData = {
-      ...req.body,
-    };
-
-    // Prevent eventId from being changed from request body
-    delete updateData.eventId;
-
-    if (updateData.event) {
-      updateData.event = {
-        ...updateData.event,
-        id: eventId,
-      };
-    }
-
-    const dashboard = await Dashboard.findOneAndUpdate(
-      { eventId },
-      {
-        $set: updateData,
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
+    const spentBudget = expenses.reduce(
+      (total, expense) =>
+        total + (Number(expense.amount) || 0),
+      0
     );
 
-    if (!dashboard) {
-      return res.status(404).json({
-        message: "Dashboard not found for this event",
-      });
-    }
+    const remainingBudget = Math.max(
+      totalBudget - spentBudget,
+      0
+    );
 
-    res.status(200).json({
-      message: "Dashboard updated successfully",
-      dashboard,
-    });
+    // -------------------------
+    // 6. UPCOMING TASKS
+    // -------------------------
+
+    const upcomingTasks = tasks
+      .filter((task) => task.status !== "Completed")
+      .slice(0, 5)
+      .map((task) => ({
+        id: task._id,
+        title: task.title,
+        due: getDueText(task.dueDate),
+        tone:
+          task.priority === "High"
+            ? "orange"
+            : task.priority === "Medium"
+            ? "caramel"
+            : "neutral",
+      }));
+
+    // -------------------------
+    // 7. RECENT ACTIVITY
+    // -------------------------
+
+    const activity = [];
+
+    guests
+      .slice(-3)
+      .reverse()
+      .forEach((guest) => {
+        activity.push({
+          id: `guest-${guest._id}`,
+          text: `${guest.name} added to guest list`,
+          time: "Guest update",
+          icon: "users",
+        });
+      });
+
+    tasks
+      .filter((task) => task.status === "Completed")
+      .slice(-3)
+      .reverse()
+      .forEach((task) => {
+        activity.push({
+          id: `task-${task._id}`,
+          text: `${task.title} completed`,
+          time: "Task completed",
+          icon: "task",
+        });
+      });
+
+    expenses
+      .slice(0, 3)
+      .forEach((expense) => {
+        activity.push({
+          id: `expense-${expense._id}`,
+          text: `${expense.name} expense added`,
+          time: `${Number(
+            expense.amount
+          ).toLocaleString()} EGP`,
+          icon: "plus",
+        });
+      });
+
+    // -------------------------
+    // 8. BUILD DASHBOARD
+    // -------------------------
+
+    const response = {
+      event: {
+        id: event._id,
+        name: event.name,
+        type: event.type,
+        date: new Date(event.date)
+          .toISOString()
+          .split("T")[0],
+        displayDate: formatEventDate(event.date),
+        location: event.location,
+        time: event.time,
+      },
+
+      stats: {
+        guests: {
+          current: confirmedGuests,
+          total: totalExpectedGuests,
+          label: "Confirmed",
+        },
+
+        budget: {
+          spent: spentBudget,
+          total: totalBudget,
+          currency: "EGP",
+        },
+
+        tasks: {
+          done: completedTasks,
+          total: totalTasks,
+        },
+
+        // Vendors will be connected to Event later
+        vendors: {
+          booked: 0,
+          total: 0,
+        },
+      },
+
+      guestOverview: {
+        confirmed: confirmedGuests,
+        maybe: maybeGuests,
+        notComing: notComingGuests,
+        noResponse: noResponseGuests,
+      },
+
+      budgetOverview: {
+        total: totalBudget,
+        spent: spentBudget,
+        remaining: remainingBudget,
+      },
+
+      taskProgress: {
+        completed: completedTasks,
+        total: totalTasks,
+      },
+
+      upcoming: upcomingTasks,
+
+      // Vendors will be fixed in a later step
+      vendors: [],
+
+      activity: activity.slice(0, 6),
+    };
+
+    return res.status(200).json(response);
   } catch (error) {
-    console.error("Update dashboard error:", error);
+    console.error(
+      "Get dashboard error:",
+      error
+    );
 
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Dashboard validation failed",
-        error: error.message,
-      });
-    }
-
-    res.status(500).json({
-      message: "Failed to update dashboard",
-      error: error.message,
-    });
-  }
-};
-
-// DELETE DASHBOARD
-// DELETE /api/events/:eventId/dashboard
-const deleteDashboard = async (req, res) => {
-  try {
-    const { eventId } = req.params;
-
-    const dashboard = await Dashboard.findOneAndDelete({
-      eventId,
-    });
-
-    if (!dashboard) {
-      return res.status(404).json({
-        message: "Dashboard not found for this event",
-      });
-    }
-
-    res.status(200).json({
-      message: "Dashboard deleted successfully",
-    });
-  } catch (error) {
-    console.error("Delete dashboard error:", error);
-
-    res.status(500).json({
-      message: "Failed to delete dashboard",
+    return res.status(500).json({
+      message: "Failed to retrieve dashboard",
       error: error.message,
     });
   }
@@ -195,7 +275,4 @@ const deleteDashboard = async (req, res) => {
 
 module.exports = {
   getDashboard,
-  createDashboard,
-  updateDashboard,
-  deleteDashboard,
 };
