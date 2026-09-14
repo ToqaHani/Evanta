@@ -1,16 +1,39 @@
 import BudgetCards from "./BudgetCards";
 import BudgetOverview from "./BudgetOverview";
 import RecentExpenses from "./RecentExpenses";
-import { useState } from "react";
-import '../Budget.css'
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useEvent } from "../../../context/EventContext";
+import "../Budget.css";
+const API_URL = "http://localhost:3000/api";
 function BudgetBody() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [popUpType, setPopUpType] = useState("");
   const [expenses, setExpenses] = useState([]);
+
+  const { currentEvent } = useEvent();
+  const eventId = currentEvent?._id;
+
   function handleAddExpense() {
     setShowPopUp(true);
     setPopUpType("add");
   }
+
+  useEffect(() => {
+    if (!eventId) return;
+
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/budget/${eventId}`);
+
+        setExpenses(response.data);
+      } catch (error) {
+        console.error("Error fetching expenses:", error.response?.data);
+      }
+    };
+
+    fetchExpenses();
+  }, [eventId]);
   return (
     <>
       <div className="container p-5">
@@ -27,13 +50,22 @@ function BudgetBody() {
             Add Expense
           </button>
         </div>
+
         <div className="d-flex flex-column gap-3">
-          <BudgetCards />
-          <BudgetOverview />
+          <BudgetCards
+            totalBudget={currentEvent?.budget || 0}
+            spent={expenses.reduce(
+              (total, expense) => total + Number(expense.amount),
+              0,
+            )}
+          />
+
+          <BudgetOverview expenses={expenses} />
+
           <RecentExpenses
             expenses={expenses}
             setExpenses={setExpenses}
-            // eventId={eventId}
+            eventId={eventId}
             showPopUp={showPopUp}
             setShowPopUp={setShowPopUp}
             popUpType={popUpType}
@@ -44,4 +76,5 @@ function BudgetBody() {
     </>
   );
 }
+
 export default BudgetBody;

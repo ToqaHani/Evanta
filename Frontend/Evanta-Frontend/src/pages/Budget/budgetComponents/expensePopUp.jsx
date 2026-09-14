@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEvent } from "../../../context/EventContext";
 import addExpense from "./addExpense";
 import closePopUp from "./closePopUp";
 import deleteExpense from "./deleteExpense";
@@ -12,34 +13,97 @@ function ExpensePopUp({
   setShowPopUp,
   setPopUpType,
 }) {
-  let [editedExpense, setEditedExpense] = useState(expense);
-  let [newExpense, setNewExpense] = useState({
+  const { currentEvent } = useEvent();
+
+  const smartPlan = currentEvent?.smartPlan;
+
+  const categoryInfo = [
+    {
+      key: "venue",
+      label: "Venue",
+      value: smartPlan?.venue,
+    },
+    {
+      key: "decoration",
+      label: "Decoration",
+      value: smartPlan?.decoration,
+    },
+    {
+      key: "catering",
+      label: "Food & Drinks",
+      value: smartPlan?.catering,
+    },
+    {
+      key: "photography",
+      label: "Photography",
+      value: smartPlan?.photography,
+    },
+    {
+      key: "entertainment",
+      label: "Entertainment",
+      value: smartPlan?.entertainment,
+    },
+    {
+      key: "invitations",
+      label: "Invitations",
+      value: smartPlan?.invitations,
+    },
+    {
+      key: "cake",
+      label: "Cake & Desserts",
+      value: smartPlan?.cake,
+    },
+    {
+      key: "flowers",
+      label: "Flowers",
+      value: smartPlan?.flowers,
+    },
+  ];
+
+  const categories = categoryInfo.filter(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+
+    return value;
+  });
+
+  const [editedExpense, setEditedExpense] = useState(expense);
+
+  const [newExpense, setNewExpense] = useState({
     name: "",
-    category: "venue",
+    category: categories[0]?.key || "",
     amount: "",
     date: "",
   });
+
   return (
     <div className="page p-2">
       <div className="message">
         {popUpType === "edit" && (
           <div className="d-flex flex-column gap-3 align-items-start">
             <h2>Edit Expense:</h2>
+
             <div className="d-flex flex-column gap-3">
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="name">Name</label>
+
                 <input
                   type="text"
                   id="name"
                   value={editedExpense.name}
                   onChange={(e) =>
-                    setEditedExpense({ ...editedExpense, name: e.target.value })
+                    setEditedExpense({
+                      ...editedExpense,
+                      name: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="category">Category</label>
+
                 <select
                   name="category"
                   id="category"
@@ -51,13 +115,17 @@ function ExpensePopUp({
                     })
                   }
                 >
-                  <option value="venue">Venue</option>
-                  <option value="food">Food</option>
+                  {categories.map((category) => (
+                    <option key={category.key} value={category.key}>
+                      {category.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="amount">Amount</label>
+
                 <input
                   type="number"
                   name="amount"
@@ -74,6 +142,7 @@ function ExpensePopUp({
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="date">Date</label>
+
                 <input
                   type="date"
                   name="date"
@@ -87,6 +156,7 @@ function ExpensePopUp({
                   }
                 />
               </div>
+
               <div className="d-flex">
                 <button
                   style={{
@@ -94,11 +164,17 @@ function ExpensePopUp({
                     border: "1px solid var(--color-green)",
                   }}
                   onClick={() =>
-                    editExpense(editedExpense, setShowPopUp, setPopUpType)
+                    editExpense(
+                      editedExpense,
+                      setExpenses,
+                      setShowPopUp,
+                      setPopUpType,
+                    )
                   }
                 >
                   Edit
                 </button>
+
                 <button
                   style={{
                     backgroundColor: "var(--color-red)",
@@ -112,9 +188,11 @@ function ExpensePopUp({
             </div>
           </div>
         )}
+
         {popUpType === "delete" && (
           <div className="d-flex flex-column gap-3">
             <h4>Are you sure you want to delete this Expense?</h4>
+
             <div className="d-flex">
               <button
                 style={{
@@ -132,6 +210,7 @@ function ExpensePopUp({
               >
                 YES
               </button>
+
               <button
                 style={{
                   backgroundColor: "var(--color-red)",
@@ -144,73 +223,104 @@ function ExpensePopUp({
             </div>
           </div>
         )}
+
         {popUpType === "add" && (
           <div className="d-flex flex-column gap-3 align-items-start">
             <h2>Add Expense:</h2>
+
             <div className="d-flex flex-column gap-3">
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="name">Name</label>
+
                 <input
                   type="text"
                   id="name"
                   placeholder="e.g. Book Venue"
                   value={newExpense.name}
                   onChange={(e) =>
-                    setNewExpense({ ...newExpense, name: e.target.value })
+                    setNewExpense({
+                      ...newExpense,
+                      name: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="category">Category</label>
+
                 <select
                   name="category"
                   id="category"
                   value={newExpense.category}
                   onChange={(e) =>
-                    setNewExpense({ ...newExpense, category: e.target.value })
+                    setNewExpense({
+                      ...newExpense,
+                      category: e.target.value,
+                    })
                   }
                 >
-                  <option value="venue">Venue</option>
-                  <option value="food">Food</option>
+                  {categories.map((category) => (
+                    <option key={category.key} value={category.key}>
+                      {category.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="amount">Amount</label>
+
                 <input
                   type="number"
                   name="amount"
                   id="amount"
                   value={newExpense.amount}
                   onChange={(e) =>
-                    setNewExpense({ ...newExpense, amount: e.target.value })
+                    setNewExpense({
+                      ...newExpense,
+                      amount: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="date">Date</label>
+
                 <input
                   type="date"
                   name="date"
                   id="date"
                   value={newExpense.date}
                   onChange={(e) =>
-                    setNewExpense({ ...newExpense, date: e.target.value })
+                    setNewExpense({
+                      ...newExpense,
+                      date: e.target.value,
+                    })
                   }
                 />
               </div>
+
               <div className="d-flex">
                 <button
                   style={{
                     backgroundColor: "var(--color-green)",
                     border: "1px solid var(--color-green)",
                   }}
-                  onClick={() => addExpense(newExpense,eventId,setShowPopUp, setPopUpType)}
+                  onClick={() =>
+                    addExpense(
+                      newExpense,
+                      eventId,
+                      setExpenses,
+                      setShowPopUp,
+                      setPopUpType,
+                    )
+                  }
                 >
                   Add
                 </button>
+
                 <button
                   style={{
                     backgroundColor: "var(--color-red)",
@@ -228,4 +338,5 @@ function ExpensePopUp({
     </div>
   );
 }
+
 export default ExpensePopUp;

@@ -1,11 +1,25 @@
 import closePopUp from "./closePopUp";
 import axios from "axios";
-async function addExpense(newExpense, eventId, setShowPopUp, setPopUpType) {
+
+async function addExpense(
+  newExpense,
+  eventId,
+  setExpenses,
+  setShowPopUp,
+  setPopUpType,
+) {
   try {
-    await axios.post(`http://localhost:3000/api/budget/${eventId}`, newExpense);
+    const response = await axios.post(
+      `http://localhost:3000/api/budget/${eventId}`,
+      newExpense,
+    );
+
+    setExpenses((prev) => [...prev, response.data]);
+
     closePopUp(setShowPopUp, setPopUpType);
   } catch (err) {
     console.log(err.message);
   }
 }
+
 export default addExpense;

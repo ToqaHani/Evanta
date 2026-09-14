@@ -1,20 +1,78 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-ChartJS.register(ArcElement, Tooltip, Legend);
-function BudgetChart() {
-  const data = {
-    labels: [
-      "Venue",
-      "Food",
-      "Decoration",
-      "Photography",
-      "Invitation",
-      "Other",
-    ],
+import { useEvent } from "../../../context/EventContext";
 
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+function BudgetChart({ expenses }) {
+  const { currentEvent } = useEvent();
+
+  const smartPlan = currentEvent?.smartPlan;
+
+  const categoryInfo = [
+    {
+      key: "venue",
+      label: "Venue",
+      value: smartPlan?.venue,
+    },
+    {
+      key: "decoration",
+      label: "Decoration",
+      value: smartPlan?.decoration,
+    },
+    {
+      key: "catering",
+      label: "Food & Drinks",
+      value: smartPlan?.catering,
+    },
+    {
+      key: "photography",
+      label: "Photography",
+      value: smartPlan?.photography,
+    },
+    {
+      key: "entertainment",
+      label: "Entertainment",
+      value: smartPlan?.entertainment,
+    },
+    {
+      key: "invitations",
+      label: "Invitations",
+      value: smartPlan?.invitations,
+    },
+    {
+      key: "cake",
+      label: "Cake & Desserts",
+      value: smartPlan?.cake,
+    },
+    {
+      key: "flowers",
+      label: "Flowers",
+      value: smartPlan?.flowers,
+    },
+  ];
+
+  const selectedCategories = categoryInfo.filter(({ value }) => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+
+    return value;
+  });
+
+  const labels = selectedCategories.map((category) => category.label);
+
+  const amounts = selectedCategories.map((category) => {
+    return expenses
+      .filter((expense) => expense.category === category.key)
+      .reduce((total, expense) => total + Number(expense.amount || 0), 0);
+  });
+
+  const data = {
+    labels,
     datasets: [
       {
-        data: [35, 30, 15, 10, 5, 5],
+        data: amounts,
         backgroundColor: [
           "#884a39",
           "#c38154",
@@ -22,6 +80,8 @@ function BudgetChart() {
           "#22c55e",
           "#8b5cf6",
           "#64748b",
+          "#ef4444",
+          "#f59e0b",
         ],
         borderWidth: 0,
       },
