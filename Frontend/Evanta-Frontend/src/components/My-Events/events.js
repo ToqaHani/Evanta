@@ -121,6 +121,27 @@ export async function deleteEvent(eventId) {
     return response.data.event;
 }
 
+export async function saveSmartPlan(eventId, data) {
+    const token =
+        localStorage.getItem("evantaToken") ||
+        sessionStorage.getItem("evantaToken");
+
+    if (!token) {
+        throw new Error("User is not logged in");
+    }
+
+    const response = await axios.put(
+        `http://localhost:3000/api/events/${eventId}/smart-plan`,
+        data,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.data.event;
+}
 export function displayType(event) {
     return event.type || "—";
 }

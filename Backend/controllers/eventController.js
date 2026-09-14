@@ -111,9 +111,57 @@ const deleteEvent = async (req, res) => {
     }
 };
 
+const saveSmartPlan = async (req, res) => {
+    try {
+        const {
+            date,
+            expectedGuests,
+            location,
+            budget,
+            smartPlan
+        } = req.body;
+
+        const event = await Event.findOneAndUpdate(
+            {
+                _id: req.params.eventId,
+                userId: req.user.userId
+            },
+            {
+                date,
+                expectedGuests,
+                location,
+                budget,
+                smartPlan
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!event) {
+            return res.status(404).json({
+                message: "Event not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Smart plan saved successfully",
+            event
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: "Failed to save smart plan",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createEvent,
     getEvents,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    saveSmartPlan
 };

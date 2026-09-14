@@ -17,6 +17,7 @@ import BudgetBody from "./pages/Budget/budgetComponents/BudgetBody";
 
 import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
 import MyEvents from "./pages/My-Events/My-EventsComponents/MyEvents";
+import SmartPlan from "./pages/Smart-Plan/smartplanComponents/SmartPlan";
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/create-event" element={<CreateEvent />} />
-          {/* <Route path="/smart-plan" element={} /> */}
+          <Route path="/smart-plan" element={<SmartPlan />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/guests" element={<GuestsBody />} />
           <Route path="/budget" element={<BudgetBody />} />

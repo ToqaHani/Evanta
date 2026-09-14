@@ -4,16 +4,15 @@ const {
     createEvent,
     getEvents,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    saveSmartPlan
 } = require("../controllers/eventController");
 
 const protect = require("../middleware/AuthMiddleware");
-
 const router = express.Router();
-
 router.post("/", protect, createEvent);
 router.get("/", protect, getEvents);
 router.put("/:eventId", protect, updateEvent);
 router.delete("/:eventId", protect, deleteEvent);
-
+router.put("/:eventId/smart-plan", protect, saveSmartPlan);
 module.exports = router;

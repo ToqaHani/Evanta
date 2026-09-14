@@ -39,6 +39,52 @@ const eventSchema = new mongoose.Schema({
     budget: {
         type: Number,
         required: true
+    },
+
+    smartPlan: {
+        venue: {
+            name: String,
+            price: Number
+        },
+
+        decoration: {
+            name: String,
+            price: Number
+        },
+
+        catering: [{
+            name: String,
+            price: Number
+        }],
+
+        photography: [{
+            name: String,
+            price: Number
+        }],
+
+        entertainment: [{
+            name: String,
+            price: Number
+        }],
+
+        invitations: [{
+            name: String,
+            price: Number
+        }],
+
+        cake: [{
+            name: String,
+            price: Number
+        }],
+
+        flowers: [{
+            name: String,
+            price: Number
+        }],
+
+        estimatedCost: {
+            type: Number
+        }
     }
 });
 
