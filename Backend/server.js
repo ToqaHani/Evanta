@@ -1,27 +1,27 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
-const authRoutes = require('./routes/userRoutes');
+const authRoutes = require("./routes/userRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const guestRoutes = require("./routes/guestRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const invitationsRoutes = require("./routes/invitationsRoutes");
+const dashboardRoutes = require("./routes/dashboard-routes/dashboardRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', authRoutes)
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/events", dashboardRoutes);
 app.use("/api/guest", guestRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/budget", expenseRoutes);
 app.use("/api/invitations", invitationsRoutes);
-
 connectDB();
 
 const port = 3000;
