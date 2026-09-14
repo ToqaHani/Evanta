@@ -17,7 +17,7 @@ import TasksBody from "./pages/Tasks/TasksComponent/TasksBody";
 import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
 import MyEvents from "./pages/My-Events/My-EventsComponents/MyEvents";
 import SmartPlan from "./pages/Smart-Plan/smartplanComponents/SmartPlan";
-
+import Invitation from "./pages/Public-Invitation/Public-invitationComponents/invitation";
 
 function App() {
   return (
@@ -46,6 +46,7 @@ function App() {
           {/* <Route path="/vendors" element={<VendorsPage />} /> */}
           <Route path="/invitations" element={<InvitationBody />} />
           <Route path="/my-events" element={<MyEvents />} />
+          <Route path="/public-invitation/:eventId" element={<Invitation />} />
         </Routes>
       </main>
     </div>
