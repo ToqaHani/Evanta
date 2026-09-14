@@ -1,15 +1,34 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-require('./config/db');
+const express = require("express");
+const cors = require("cors");
+const connectDB = require("./config/db");
+
+const authRoutes = require("./routes/userRoutes");
+const eventRoutes = require("./routes/eventRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const guestRoutes = require("./routes/guestRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const expenseRoutes = require("./routes/expenseRoutes");
+const invitationsRoutes = require("./routes/invitationsRoutes");
+const vendorRoutes = require("./routes/vendorRoutes");
+
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-const expenseRoutes = require('./routes/expenseRoutes');
-const invitationsRoutes = require('./routes/invitationsRoutes');
-app.use('/api/budget', expenseRoutes)
-app.use('/api/invitations', invitationsRoutes)
-let port = 3000;
+
+app.use("/api/auth", authRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/guest", guestRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/budget", expenseRoutes);
+app.use("/api/invitations", invitationsRoutes);
+app.use("/api/vendors", vendorRoutes);
+
+connectDB();
+
+const port = 3000;
+
 app.listen(port, () => {
-    console.log(`Server is running on port ${port} 🚀`);
-})
+  console.log(`Server is running on port ${port}`);
+});

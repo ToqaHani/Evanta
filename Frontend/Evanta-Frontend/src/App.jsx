@@ -59,7 +59,6 @@ function App() {
         }
       >
         <Routes>
-          {/* LANDING */}
           <Route
             path="/"
             element={
@@ -71,18 +70,9 @@ function App() {
             }
           />
 
-          {/* AUTH */}
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-
-          {/* EVENT CREATION */}
           <Route
             path="/create-event"
             element={<CreateEvent />}
@@ -93,7 +83,6 @@ function App() {
             element={<SmartPlan />}
           />
 
-          {/* EVENT WORKSPACE */}
           <Route
             path="/dashboard"
             element={<Dashboard />}
@@ -129,7 +118,6 @@ function App() {
             element={<MyEvents />}
           />
 
-          {/* PUBLIC INVITATION */}
           <Route
             path="/public-invitation/:eventId"
             element={<Invitation />}

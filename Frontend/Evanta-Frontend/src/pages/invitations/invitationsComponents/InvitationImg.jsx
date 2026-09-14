@@ -23,7 +23,9 @@ function InvitationImg({
 
   // بتحكم في مسح الصورة و ال label
   function handleRemove() {
+    console.log("REMOVE BUTTON CLICKED");
     inputRef.current.value = null;
+    console.log("CALLING HANDLE DELETE");
     handleDelete();
   }
 

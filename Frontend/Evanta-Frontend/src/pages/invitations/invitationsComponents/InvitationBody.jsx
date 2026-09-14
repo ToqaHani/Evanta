@@ -2,14 +2,18 @@ import { useState, useEffect } from "react";
 import InvitationImg from "./InvitationImg";
 import InvitationLink from "./InvitationLink";
 import InvitationQR from "./InvitationQR";
+import { useEvent } from "../../../context/EventContext";
 import axios from "axios";
+import "../invitations.css";
 function InvitationBody() {
   // فايل الصورة علشان احطه في ال event invitation
   let [imgFile, setImgFile] = useState(null);
   let [imageUrl, setImageUrl] = useState(null);
   let [invitationUrl, setInvitationUrl] = useState(null);
-  const eventId = "EVENT_ID_HERE";
+  const { currentEvent } = useEvent();
+  const eventId = currentEvent?._id;
   async function handleUpload(file) {
+    if (!eventId) return;
     const formData = new FormData();
     formData.append("invitationImage", file);
     formData.append(
@@ -28,6 +32,13 @@ function InvitationBody() {
     }
   }
   async function handleDelete() {
+    console.log("Current Event:", currentEvent);
+    console.log("Event ID:", eventId);
+
+    if (!eventId) {
+      console.log("No current event selected");
+      return;
+    }
     try {
       await axios.delete(`http://localhost:3000/api/invitations/${eventId}`);
 
@@ -39,6 +50,7 @@ function InvitationBody() {
     }
   }
   useEffect(() => {
+    if (!eventId) return;
     async function getInvitation() {
       try {
         const response = await axios.get(
