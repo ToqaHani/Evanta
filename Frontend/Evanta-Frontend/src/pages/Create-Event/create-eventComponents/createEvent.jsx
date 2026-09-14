@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../create-event.css";
+import { useEvent } from "../../../context/EventContext";
 import { addEvent, EVENT_TYPES } from "../../../components/My-Events/events";
 
 const initial = {
@@ -17,6 +18,7 @@ export default function CreateEvent() {
   const [form, setForm] = useState(initial);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { setCurrentEvent } = useEvent();
 
   const set = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -33,7 +35,9 @@ export default function CreateEvent() {
     }
 
     try {
-      await addEvent(form);
+      const createdEvent = await addEvent(form);
+
+      setCurrentEvent(createdEvent);
 
       setForm(initial);
       setSuccess("Event created successfully.");

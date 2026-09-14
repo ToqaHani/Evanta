@@ -4,14 +4,16 @@ import { BrowserRouter } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import { EventProvider } from "./context/EventContext";
 import App from "./App.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <EventProvider>
+        <App />
+      </EventProvider>
     </BrowserRouter>
   </StrictMode>
 );

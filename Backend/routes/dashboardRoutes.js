@@ -5,7 +5,7 @@ const {
   createDashboard,
   updateDashboard,
   deleteDashboard,
-} = require("../../controllers/dashboard-controllers/dashboardController");
+} = require("../controllers/dashboardController");
 
 const router = express.Router();
 

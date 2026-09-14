@@ -6,7 +6,7 @@ const {
   createVendor,
   updateVendor,
   deleteVendor,
-} = require("../../controllers/controllers-vendors/vendorController");
+} = require("../controllers/vendorController");
 
 const router = express.Router();
 

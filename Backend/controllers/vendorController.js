@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Vendor = require("../../models/models-vendors/Vendor");
+const Vendor = require("../models/vendors");
 
 // GET ALL VENDORS
 const getVendors = async (req, res) => {

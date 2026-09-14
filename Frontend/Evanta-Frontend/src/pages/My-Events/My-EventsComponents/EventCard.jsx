@@ -5,7 +5,14 @@ import {
   formatMoney,
 } from "../../../components/My-Events/events";
 
-export default function EventCard({ event, index, onView, onEdit, onDelete }) {
+export default function EventCard({
+  event,
+  index,
+  onView,
+  onEdit,
+  onDelete,
+  onWorkOn,
+}) {
   return (
     <div className="col-12 col-md-6 col-xl-4">
       <article
@@ -14,7 +21,7 @@ export default function EventCard({ event, index, onView, onEdit, onDelete }) {
       >
         <span className="evanta-chip">{displayType(event)}</span>
 
-        <h3 className="evanta-card-title">{event.eventName}</h3>
+        <h3 className="evanta-card-title">{event.name}</h3>
 
         <ul className="evanta-meta">
           <li>
@@ -35,6 +42,12 @@ export default function EventCard({ event, index, onView, onEdit, onDelete }) {
         </ul>
 
         <div className="evanta-card-actions">
+          <button
+            className="btn-evanta btn-evanta-solid"
+            onClick={() => onWorkOn(event)}
+          >
+            Work on
+          </button>
           <button
             className="btn-evanta btn-evanta-solid"
             onClick={() => onView(event)}

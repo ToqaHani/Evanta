@@ -1,4 +1,4 @@
-const Dashboard = require("../../models/dashboard-models/Dashboard");
+const Dashboard = require("../models/Dashboard");
 
 // GET DASHBOARD
 // GET /api/events/:eventId/dashboard
