@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const taskSchema = new mongoose.Schema(
   {
     eventId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
       required: true,
     },
 
