@@ -1,5 +1,6 @@
 const Task = require("../models/Task");
 
+// Get all tasks for an event
 const getTasks = async (req, res) => {
   try {
     const tasks = await Task.find({
@@ -15,19 +16,20 @@ const getTasks = async (req, res) => {
   }
 };
 
+// Create a new task
 const createTask = async (req, res) => {
   try {
-    const { title, assignedTo, description, dueDate, status, priority } =
+    const { title, description, dueDate, status, priority, assignedTo } =
       req.body;
 
     const task = await Task.create({
       eventId: req.params.eventId,
       title,
-      assignedTo,
       description,
       dueDate,
       status,
       priority,
+      assignedTo,
     });
 
     res.status(201).json(task);
@@ -39,6 +41,7 @@ const createTask = async (req, res) => {
   }
 };
 
+// Update a task
 const updateTask = async (req, res) => {
   try {
     const task = await Task.findByIdAndUpdate(req.params.taskId, req.body, {
@@ -61,6 +64,7 @@ const updateTask = async (req, res) => {
   }
 };
 
+// Delete a task
 const deleteTask = async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.taskId);

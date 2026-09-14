@@ -79,6 +79,7 @@ function AddTaskModal({
                 type="date"
                 value={formData.dueDate}
                 onChange={onInputChange}
+                required
               />
             </div>
 
@@ -92,7 +93,9 @@ function AddTaskModal({
                 onChange={onInputChange}
               >
                 <option value="High">High</option>
+
                 <option value="Medium">Medium</option>
+
                 <option value="Low">Low</option>
               </select>
             </div>
@@ -124,7 +127,7 @@ function AddTaskModal({
                 placeholder="Add any notes or details about this task..."
                 value={formData.notes}
                 onChange={onInputChange}
-              ></textarea>
+              />
             </div>
           </div>
 

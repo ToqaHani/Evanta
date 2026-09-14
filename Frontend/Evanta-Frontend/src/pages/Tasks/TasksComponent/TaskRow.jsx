@@ -13,7 +13,7 @@ function TaskRow({
           className={`task-status-dot ${task.status
             .toLowerCase()
             .replace(" ", "-")}`}
-        ></div>
+        />
 
         <div>
           <strong>{task.title}</strong>

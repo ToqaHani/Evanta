@@ -12,12 +12,12 @@ import CreateEvent from "./pages/Create-Event/create-eventComponents/createEvent
 import Dashboard from "./pages/Public-dashboard/Dashboard";
 import GuestsBody from "./pages/Guests/GuestsComponents/GuestsBody";
 import BudgetBody from "./pages/Budget/budgetComponents/BudgetBody";
-
-// import TasksPage from "./pages/Tasks/TasksComponent/TasksPage";
+import TasksBody from "./pages/Tasks/TasksComponent/TasksBody";
 
 import InvitationBody from "./pages/invitations/invitationsComponents/InvitationBody";
 import MyEvents from "./pages/My-Events/My-EventsComponents/MyEvents";
 import SmartPlan from "./pages/Smart-Plan/smartplanComponents/SmartPlan";
+
 
 function App() {
   return (
@@ -42,7 +42,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/guests" element={<GuestsBody />} />
           <Route path="/budget" element={<BudgetBody />} />
-          {/* <Route path="/tasks" element={<TasksPage />} /> */}
+          <Route path="/tasks" element={<TasksBody />} />
           {/* <Route path="/vendors" element={<VendorsPage />} /> */}
           <Route path="/invitations" element={<InvitationBody />} />
           <Route path="/my-events" element={<MyEvents />} />

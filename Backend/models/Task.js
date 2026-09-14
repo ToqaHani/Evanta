@@ -3,19 +3,13 @@ const mongoose = require("mongoose");
 const taskSchema = new mongoose.Schema(
   {
     eventId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       required: true,
     },
 
     title: {
       type: String,
       required: true,
-      trim: true,
-    },
-
-    assignedTo: {
-      type: String,
-      default: "",
       trim: true,
     },
 
@@ -40,6 +34,12 @@ const taskSchema = new mongoose.Schema(
       type: String,
       enum: ["Low", "Medium", "High"],
       default: "Medium",
+    },
+
+    assignedTo: {
+      type: String,
+      default: "",
+      trim: true,
     },
   },
   {
