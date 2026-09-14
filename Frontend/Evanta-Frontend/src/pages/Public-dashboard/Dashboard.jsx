@@ -25,7 +25,6 @@ export default function Dashboard() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const load = async () => {
-    // No event selected
     if (!currentEvent?._id) {
       setData(null);
       setError("");
@@ -45,8 +44,7 @@ export default function Dashboard() {
       console.error("Dashboard loading error:", err);
 
       setError(
-        err.message ||
-          "We couldn't load the dashboard. Please try again."
+        err.message || "We couldn't load the dashboard. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -56,10 +54,6 @@ export default function Dashboard() {
   useEffect(() => {
     load();
   }, [currentEvent?._id]);
-
-  // -----------------------------
-  // SAFE PERCENTAGE CALCULATIONS
-  // -----------------------------
 
   const guestPct = useMemo(() => {
     if (!data?.stats?.guests) return 0;
@@ -105,40 +99,17 @@ export default function Dashboard() {
     return Math.round((booked / total) * 100);
   }, [data]);
 
-  // -----------------------------
-  // NO ACTIVE EVENT
-  // -----------------------------
-
+  // No active event
   if (!loading && !currentEvent?._id) {
     return (
       <div className="app-shell">
         <main className="main-content">
-          <header className="topbar">
-            <div className="breadcrumb">
-              <span>My Events</span>
-              <b>/</b>
-              <strong>Dashboard</strong>
-            </div>
-
-            <div className="top-actions">
-              <button className="icon-btn" title="Activity">
-                <Icon name="activity" />
-              </button>
-
-              <button className="profile-btn">
-                <span className="avatar">A</span>
-                <span className="profile-name">Ahmed</span>
-                <Icon name="chevron" size={15} />
-              </button>
-            </div>
-          </header>
-
           <div className="error-state">
             <h2>No event selected</h2>
 
             <p>
-              Please create an event or select one from My Events to view
-              its dashboard.
+              Please create an event or select one from My Events to view its
+              dashboard.
             </p>
           </div>
         </main>
@@ -149,26 +120,6 @@ export default function Dashboard() {
   return (
     <div className="app-shell">
       <main className="main-content">
-        <header className="topbar">
-          <div className="breadcrumb">
-            <span>My Events</span>
-            <b>/</b>
-            <strong>Dashboard</strong>
-          </div>
-
-          <div className="top-actions">
-            <button className="icon-btn" title="Activity">
-              <Icon name="activity" />
-            </button>
-
-            <button className="profile-btn">
-              <span className="avatar">A</span>
-              <span className="profile-name">Ahmed</span>
-              <Icon name="chevron" size={15} />
-            </button>
-          </div>
-        </header>
-
         {/* LOADING */}
         {loading && !data && <DashboardSkeleton />}
 
@@ -215,18 +166,6 @@ export default function Dashboard() {
                 </div>
 
                 <div className="hero-actions">
-                  <button
-                    className="secondary-btn"
-                    onClick={() =>
-                      alert(
-                        "Event switcher will connect to the My Events page."
-                      )
-                    }
-                  >
-                    <Icon name="repeat" size={16} />
-                    Switch Event
-                  </button>
-
                   <button className="ghost-btn" onClick={load}>
                     <Icon name="activity" size={16} />
                     Refresh
@@ -235,9 +174,7 @@ export default function Dashboard() {
               </div>
 
               {data.event?.date && (
-                <Countdown
-                  date={`${data.event.date}T19:00:00`}
-                />
+                <Countdown date={`${data.event.date}T19:00:00`} />
               )}
 
               <div className="hero-decor decor-one" />
@@ -249,9 +186,7 @@ export default function Dashboard() {
               <div className="inline-alert">
                 <span>{error}</span>
 
-                <button onClick={load}>
-                  Retry
-                </button>
+                <button onClick={load}>Retry</button>
               </div>
             )}
 
@@ -269,30 +204,23 @@ export default function Dashboard() {
             <section className="section-block">
               <div className="section-title">
                 <div>
-                  <span className="section-kicker">
-                    QUICK STATS
-                  </span>
+                  <span className="section-kicker">QUICK STATS</span>
 
                   <h2>At a glance</h2>
                 </div>
 
-                <span className="section-note">
-                  Your event in numbers
-                </span>
+                <span className="section-note">Your event in numbers</span>
               </div>
 
               <div className="stats-grid">
                 <StatCard
                   icon="users"
                   title="Guests"
-                  value={`${
-                    data.stats?.guests?.current || 0
-                  } / ${
+                  value={`${data.stats?.guests?.current || 0} / ${
                     data.stats?.guests?.total || 0
                   }`}
                   subtitle={`${
-                    data.stats?.guests?.label ||
-                    "Confirmed"
+                    data.stats?.guests?.label || "Confirmed"
                   } • ${guestPct}%`}
                   progress={guestPct}
                   className="guests"
@@ -307,8 +235,7 @@ export default function Dashboard() {
                     data.stats?.budget?.total || 0
                   ).toLocaleString()}`}
                   subtitle={`${
-                    data.stats?.budget?.currency ||
-                    "EGP"
+                    data.stats?.budget?.currency || "EGP"
                   } • ${budgetPct}% used`}
                   progress={budgetPct}
                   className="budget"
@@ -317,9 +244,7 @@ export default function Dashboard() {
                 <StatCard
                   icon="checkSquare"
                   title="Tasks"
-                  value={`${
-                    data.stats?.tasks?.done || 0
-                  } / ${
+                  value={`${data.stats?.tasks?.done || 0} / ${
                     data.stats?.tasks?.total || 0
                   }`}
                   subtitle={`${taskPct}% completed`}
@@ -330,9 +255,7 @@ export default function Dashboard() {
                 <StatCard
                   icon="briefcase"
                   title="Vendors"
-                  value={`${
-                    data.stats?.vendors?.booked || 0
-                  } / ${
+                  value={`${data.stats?.vendors?.booked || 0} / ${
                     data.stats?.vendors?.total || 0
                   }`}
                   subtitle={`${vendorPct}% booked`}
@@ -344,42 +267,29 @@ export default function Dashboard() {
 
             {/* OVERVIEW */}
             <section className="dashboard-grid two-col">
-              <GuestOverview
-                data={data.guestOverview}
-              />
+              <GuestOverview data={data.guestOverview} />
 
-              <BudgetOverview
-                data={data.budgetOverview}
-              />
+              <BudgetOverview data={data.budgetOverview} />
             </section>
 
             {/* TASKS / UPCOMING / VENDORS */}
             <section className="dashboard-grid three-col">
-              <TaskProgress
-                data={data.taskProgress}
-              />
+              <TaskProgress data={data.taskProgress} />
 
-              <Upcoming
-                items={data.upcoming || []}
-              />
+              <Upcoming items={data.upcoming || []} />
 
-              <Vendors
-                items={data.vendors || []}
-              />
+              <Vendors items={data.vendors || []} />
             </section>
 
             {/* ACTIVITY */}
             <section className="dashboard-grid one-col">
-              <Activity
-                items={data.activity || []}
-              />
+              <Activity items={data.activity || []} />
             </section>
 
             <footer className="dashboard-footer">
               <Icon name="sparkle" size={15} />
-              Evanta keeps you focused on the big day —
-              you make the decisions, we keep the plan
-              clear.
+              Evanta keeps you focused on the big day — you make the decisions,
+              we keep the plan clear.
             </footer>
           </>
         )}
