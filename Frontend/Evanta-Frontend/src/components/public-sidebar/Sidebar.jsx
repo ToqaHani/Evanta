@@ -1,21 +1,74 @@
 import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+
 import Icon from "./Icons";
+import { useEvent } from "../../context/EventContext";
+
 import "./sidebar.css";
 
 const links = [
-  ["Dashboard", "grid"],
-  ["Guests", "users"],
-  ["Budget", "wallet"],
-  ["Tasks", "checkSquare"],
-  ["Vendors", "briefcase"],
-  ["Invitations", "mail"],
+  {
+    label: "Dashboard",
+    icon: "grid",
+    path: "/dashboard",
+  },
+  {
+    label: "Guests",
+    icon: "users",
+    path: "/guests",
+  },
+  {
+    label: "Budget",
+    icon: "wallet",
+    path: "/budget",
+  },
+  {
+    label: "Tasks",
+    icon: "checkSquare",
+    path: "/tasks",
+  },
+  {
+    label: "Vendors",
+    icon: "briefcase",
+    path: "/vendors",
+  },
+  {
+    label: "Invitations",
+    icon: "mail",
+    path: "/invitations",
+  },
 ];
+
+const formatEventDate = (date) => {
+  if (!date) {
+    return "No date";
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "No date";
+  }
+
+  return parsedDate.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 export default function Sidebar({
   mobileOpen = false,
   onClose = () => {},
-  active = "Dashboard",
 }) {
+  const navigate = useNavigate();
+  const { currentEvent } = useEvent();
+
+  const handleSwitchEvent = () => {
+    onClose();
+    navigate("/my-events");
+  };
+
   return (
     <>
       <div
@@ -30,6 +83,7 @@ export default function Sidebar({
           mobileOpen ? "open" : ""
         }`}
       >
+        {/* LOGO */}
         <div className="evanta-sidebar-brand">
           <img
             className="evanta-sidebar-logo"
@@ -38,83 +92,86 @@ export default function Sidebar({
           />
         </div>
 
+        {/* ACTIVE EVENT */}
         <div className="evanta-sidebar-event">
           <div className="evanta-sidebar-eyebrow">
             ACTIVE EVENT
           </div>
 
-          <strong>Toka & Ahmed</strong>
+          {currentEvent ? (
+            <>
+              <strong>
+                {currentEvent.name || "Unnamed Event"}
+              </strong>
 
-          <span>Engagement</span>
-          <span>20 Sep 2026</span>
+              <span>
+                {currentEvent.type || "Event"}
+              </span>
+
+              <span>
+                {formatEventDate(currentEvent.date)}
+              </span>
+            </>
+          ) : (
+            <>
+              <strong>No active event</strong>
+
+              <span>
+                Select or create an event
+              </span>
+            </>
+          )}
 
           <button
             className="evanta-sidebar-switch"
             type="button"
+            onClick={handleSwitchEvent}
           >
             <Icon name="repeat" size={15} />
             Switch Event
           </button>
         </div>
 
+        {/* MAIN NAVIGATION */}
         <nav
           className="evanta-sidebar-nav"
           aria-label="Event navigation"
         >
-          {links.map(([label, icon]) => (
-            <a
-              key={label}
-              className={`evanta-sidebar-nav-item ${
-                active === label ? "active" : ""
-              }`}
-              href={`#${label.toLowerCase()}`}
+          {links.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
               onClick={onClose}
+              className={({ isActive }) =>
+                `evanta-sidebar-nav-item ${
+                  isActive ? "active" : ""
+                }`
+              }
             >
-              <Icon name={icon} />
-              <span>{label}</span>
-            </a>
+              <Icon name={item.icon} />
+
+              <span>{item.label}</span>
+            </NavLink>
           ))}
         </nav>
 
         <div className="evanta-sidebar-divider" />
 
-        <a
-          className="evanta-sidebar-nav-item"
-          href="#my-events"
+        {/* MY EVENTS */}
+        <NavLink
+          to="/my-events"
           onClick={onClose}
+          className={({ isActive }) =>
+            `evanta-sidebar-nav-item ${
+              isActive ? "active" : ""
+            }`
+          }
         >
           <Icon name="calendar" />
           <span>My Events</span>
-        </a>
-
-        <a
-          className="evanta-sidebar-nav-item"
-          href="#settings"
-          onClick={onClose}
-        >
-          <Icon name="activity" />
-          <span>Event Settings</span>
-        </a>
+        </NavLink>
 
         <div className="evanta-sidebar-spacer" />
-
-        <a
-          className="evanta-sidebar-nav-item"
-          href="#profile"
-          onClick={onClose}
-        >
-          <Icon name="user" />
-          <span>Profile</span>
-        </a>
-
-        <a
-          className="evanta-sidebar-nav-item evanta-sidebar-logout"
-          href="#logout"
-          onClick={onClose}
-        >
-          <Icon name="logout" />
-          <span>Logout</span>
-        </a>
       </aside>
     </>
   );
