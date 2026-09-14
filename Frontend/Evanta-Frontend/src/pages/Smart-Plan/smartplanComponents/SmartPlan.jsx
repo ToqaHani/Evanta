@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../SmartPlan.css";
 import { useEvent } from "../../../context/EventContext";
 import { saveSmartPlan } from "../../../components/My-Events/events";
@@ -88,6 +89,7 @@ const FLOWERS = [
 ];
 
 function SmartPlan() {
+  const navigate = useNavigate();
   const { currentEvent, setCurrentEvent } = useEvent();
   // =========================
   // EVENT INFORMATION
@@ -297,7 +299,12 @@ function SmartPlan() {
       setError(validationError);
       return;
     }
-
+    if (estimatedCost > budget) {
+      setError(
+        "Your estimated cost is higher than your budget. Please adjust your selections.",
+      );
+      return;
+    }
     if (!currentEvent?._id) {
       setError("Please select an event first.");
       return;
@@ -374,36 +381,6 @@ function SmartPlan() {
     } catch (error) {
       setError(error.response?.data?.message || "Failed to save smart plan.");
     }
-  };
-
-  // =========================
-  // RESET PLAN
-  // =========================
-
-  const resetPlan = () => {
-    setSelectedEvent("");
-    setEventDate("");
-    setGuests("");
-    setLocation("");
-    setBudget(25000);
-
-    setVenue("");
-    setDecoration("");
-
-    setCatering([]);
-    setPhotography([]);
-    setEntertainment([]);
-    setInvitations([]);
-    setCake([]);
-    setFlowers([]);
-
-    setError("");
-    setShowPlan(false);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
   };
 
   // =========================
@@ -1025,8 +1002,11 @@ function SmartPlan() {
                 Edit Plan
               </button>
 
-              <button className="new-plan-btn" onClick={resetPlan}>
-                Start Another Plan
+              <button
+                className="new-plan-btn"
+                onClick={() => navigate("/dashboard")}
+              >
+                Start your Plan
               </button>
             </div>
           </div>

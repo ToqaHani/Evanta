@@ -1,10 +1,18 @@
 const mongoose = require("mongoose");
 const Vendor = require("../models/vendors");
 
-// GET ALL VENDORS
+// GET ALL VENDORS FOR ONE EVENT
 const getVendors = async (req, res) => {
   try {
-    const vendors = await Vendor.find().sort({ createdAt: -1 });
+    const { eventId } = req.params;
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
+    }
+
+    const vendors = await Vendor.find({ eventId }).sort({ createdAt: -1 });
 
     res.status(200).json(vendors);
   } catch (error) {
@@ -46,6 +54,14 @@ const getVendorById = async (req, res) => {
 // CREATE VENDOR
 const createVendor = async (req, res) => {
   try {
+    const { eventId } = req.params;
+
+    if (!mongoose.isValidObjectId(eventId)) {
+      return res.status(400).json({
+        message: "Invalid event ID",
+      });
+    }
+
     const {
       type,
       name,
@@ -63,6 +79,7 @@ const createVendor = async (req, res) => {
     }
 
     const vendor = await Vendor.create({
+      eventId,
       type,
       name,
       phone,

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 import "../Auth.css";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
@@ -26,7 +27,7 @@ export default function Login() {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,6 +54,7 @@ export default function Login() {
       localStorage.setItem("evantaUser", JSON.stringify(data.user));
 
       setSuccess("Login successful!");
+      navigate("/create-event");
     } catch (error) {
       setError(error.message);
     } finally {

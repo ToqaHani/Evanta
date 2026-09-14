@@ -1,4 +1,5 @@
 /* My Events page */
+
 /* cards */
 .evanta-card,
 .evanta-empty,
@@ -15,17 +16,20 @@
     box-shadow 0.4s var(--evanta-ease),
     border-color 0.4s var(--evanta-ease);
 }
+
 .evanta-card {
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
 }
+
 .evanta-card:hover,
 .evanta-feature:hover {
   transform: translateY(-8px);
   box-shadow: var(--evanta-shadow-lg);
   border-color: oklch(0.762 0.121 82 / 0.45);
 }
+
 .evanta-card-title {
   font-family: "Cormorant Garamond", serif;
   font-size: 1.6rem;
@@ -33,6 +37,7 @@
   color: var(--evanta-brown-deep);
   margin: 0.85rem 0 0.5rem;
 }
+
 .evanta-chip {
   align-self: flex-start;
   padding: 0.3rem 0.85rem;
@@ -43,11 +48,13 @@
   color: var(--evanta-brown-deep);
   background: oklch(0.906 0.031 82 / 0.8);
 }
+
 .evanta-meta {
   list-style: none;
   padding: 0;
   margin: 0 0 1.5rem;
 }
+
 .evanta-meta li {
   display: flex;
   align-items: center;
@@ -56,10 +63,12 @@
   font-size: 0.94rem;
   color: oklch(0.42 0.028 55);
 }
+
 .evanta-meta svg {
   color: var(--evanta-gold-deep);
   flex: none;
 }
+
 .evanta-card-actions {
   display: flex;
   flex-wrap: wrap;
@@ -71,6 +80,7 @@
   padding: 2rem;
   height: 100%;
 }
+
 .evanta-feature-icon {
   display: grid;
   place-items: center;
@@ -81,6 +91,7 @@
   background: var(--evanta-brown-deep);
   margin-bottom: 1.1rem;
 }
+
 .evanta-feature-title {
   font-family: "Cormorant Garamond", serif;
   font-size: 1.45rem;
@@ -92,6 +103,7 @@
   padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem;
   text-align: center;
 }
+
 .evanta-empty-icon {
   display: grid;
   place-items: center;
@@ -103,6 +115,7 @@
   background: oklch(0.762 0.121 82 / 0.15);
   border: 1px solid oklch(0.762 0.121 82 / 0.35);
 }
+
 .evanta-empty-title {
   font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
@@ -119,64 +132,179 @@
 .evanta-overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 9999;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 1rem;
-  background: oklch(0.238 0.032 52 / 0.45);
-  backdrop-filter: blur(6px);
-  animation: evanta-fade 0.25s ease forwards;
+
+  background: rgba(43, 37, 34, 0.18);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
-@keyframes evanta-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+
 .evanta-modal {
+  position: relative;
+  z-index: 10000;
+
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
   max-height: 88vh;
+
   overflow-y: auto;
-  padding: 1.75rem;
-  border-radius: 24px;
-  background: var(--evanta-soft-white);
-  box-shadow: var(--evanta-shadow-lg);
-  animation: evanta-fade-up 0.35s var(--evanta-ease) forwards;
-  opacity: 0;
-  transform: translateY(18px);
+
+  padding: 2rem;
+  border-radius: 26px;
+
+  background: #fdfaf5;
+  border: 1px solid rgba(136, 74, 57, 0.12);
+  box-shadow: 0 20px 60px rgba(43, 37, 34, 0.2);
+
+  opacity: 1;
+  transform: translateY(0);
 }
+/* modal title */
 .evanta-modal-title {
   font-family: "Cormorant Garamond", serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   margin: 0;
   color: var(--evanta-brown-deep);
 }
+
+/* close button */
 .evanta-close {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+
+  width: 38px;
+  height: 38px;
+
   border-radius: 50%;
-  border: 1px solid oklch(0.318 0.038 55 / 0.15);
-  background: transparent;
+  border: 1px solid oklch(0.318 0.038 55 / 0.14);
+
+  background: var(--evanta-soft-white);
   color: var(--evanta-brown);
-  transition: background-color 0.3s var(--evanta-ease);
-}
-.evanta-close:hover {
-  background: oklch(0.906 0.031 82 / 0.7);
+
+  transition:
+    background-color 0.25s var(--evanta-ease),
+    color 0.25s var(--evanta-ease),
+    transform 0.25s var(--evanta-ease);
 }
 
-.evanta-detail-row span {
-  color: var(--evanta-brown);
-  font-size: 0.85rem;
+.evanta-close:hover {
+  background: oklch(0.906 0.031 82 / 0.7);
+  color: var(--evanta-brown-deep);
+  transform: rotate(90deg);
+}
+
+/* event details header */
+.event-details-header {
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.25rem;
+
+  border-radius: 18px;
+
+  background: oklch(0.906 0.031 82 / 0.55);
+  border: 1px solid oklch(0.762 0.121 82 / 0.18);
+}
+
+.event-details-header h3 {
+  margin: 0 0 0.45rem;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+
+  color: var(--evanta-brown-deep);
+}
+
+.event-details-header span {
+  display: inline-block;
+
+  padding: 0.32rem 0.75rem;
+
+  border-radius: 999px;
+
+  background: var(--evanta-brown-deep);
+  color: var(--evanta-cream);
+
+  font-size: 0.7rem;
+  font-weight: 600;
+
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.evanta-detail-row strong {
+
+/* event details */
+.evanta-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.evanta-detail-card {
+  min-height: 78px;
+
+  padding: 0.95rem 1rem;
+
+  border-radius: 16px;
+
+  background: oklch(0.99 0.005 90 / 0.8);
+  border: 1px solid oklch(0.318 0.038 55 / 0.08);
+
+  transition:
+    border-color 0.25s var(--evanta-ease),
+    transform 0.25s var(--evanta-ease);
+}
+
+.evanta-detail-card:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.762 0.121 82 / 0.3);
+}
+
+.evanta-detail-card span {
+  display: block;
+
+  margin-bottom: 0.35rem;
+
+  color: var(--evanta-brown);
+  font-size: 0.68rem;
+  font-weight: 600;
+
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.evanta-detail-card strong {
+  display: block;
+
   color: var(--evanta-brown-deep);
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+/* old detail rows are no longer used */
+.evanta-detail-row {
+  display: none;
+}
+
+/* responsive */
+@media (max-width: 576px) {
+  .evanta-modal {
+    padding: 1.35rem;
+    border-radius: 22px;
+  }
+
+  .evanta-modal-title {
+    font-size: 1.7rem;
+  }
+
+  .evanta-details-grid {
+    grid-template-columns: 1fr;
+  }
 }

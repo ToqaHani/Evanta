@@ -18,9 +18,9 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/guest", guestRoutes);
-app.use("/api/tasks", taskRoutes);
+app.use("/api/events", dashboardRoutes);
+app.use("/api", guestRoutes);
+app.use("/api", taskRoutes);
 app.use("/api/budget", expenseRoutes);
 app.use("/api/invitations", invitationsRoutes);
 app.use("/api/vendors", vendorRoutes);

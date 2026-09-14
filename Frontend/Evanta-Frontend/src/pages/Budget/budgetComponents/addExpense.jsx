@@ -14,7 +14,7 @@ async function addExpense(
       newExpense,
     );
 
-    setExpenses((prev) => [...prev, response.data]);
+    setExpenses((prev) => [...prev, response.data.expense]);
 
     closePopUp(setShowPopUp, setPopUpType);
   } catch (err) {

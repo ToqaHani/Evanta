@@ -156,7 +156,10 @@ export default function MyEvents() {
                 setFormOpen(true);
               }}
               onDelete={setPendingDelete}
-              onWorkOn={(event) => setCurrentEvent(event)}
+              onWorkOn={(event) => {
+                setCurrentEvent(event);
+                navigate("/dashboard");
+              }}
             />
           ))}
         </div>
@@ -174,7 +177,10 @@ export default function MyEvents() {
       )}
 
       {viewing && (
-        <EventDetailsModal event={viewing} onClose={() => setViewing(null)} />
+        <EventDetailsModal
+          event={viewing}
+          onClose={() => setViewing(null)}
+        />
       )}
 
       {pendingDelete && (

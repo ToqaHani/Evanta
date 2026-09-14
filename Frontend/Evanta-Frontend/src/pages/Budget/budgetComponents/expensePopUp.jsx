@@ -69,6 +69,7 @@ function ExpensePopUp({
   });
 
   const [editedExpense, setEditedExpense] = useState(expense);
+  const [showError, setShowError] = useState(false);
 
   const [newExpense, setNewExpense] = useState({
     name: "",
@@ -80,11 +81,13 @@ function ExpensePopUp({
   return (
     <div className="page p-2">
       <div className="message">
+        {/* EDIT */}
         {popUpType === "edit" && (
           <div className="d-flex flex-column gap-3 align-items-start">
             <h2>Edit Expense:</h2>
 
             <div className="d-flex flex-column gap-3">
+              {/* Name */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="name">Name</label>
 
@@ -99,8 +102,13 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !editedExpense.name && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Category */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="category">Category</label>
 
@@ -123,6 +131,7 @@ function ExpensePopUp({
                 </select>
               </div>
 
+              {/* Amount */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="amount">Amount</label>
 
@@ -138,8 +147,13 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !editedExpense.amount && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Date */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="date">Date</label>
 
@@ -155,22 +169,36 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !editedExpense.date && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Buttons */}
               <div className="d-flex">
                 <button
                   style={{
                     backgroundColor: "var(--color-green)",
                     border: "1px solid var(--color-green)",
                   }}
-                  onClick={() =>
+                  onClick={() => {
+                    if (
+                      !editedExpense.name ||
+                      !editedExpense.amount ||
+                      !editedExpense.date
+                    ) {
+                      setShowError(true);
+                      return;
+                    }
+
                     editExpense(
                       editedExpense,
                       setExpenses,
                       setShowPopUp,
                       setPopUpType,
-                    )
-                  }
+                    );
+                  }}
                 >
                   Edit
                 </button>
@@ -189,6 +217,7 @@ function ExpensePopUp({
           </div>
         )}
 
+        {/* DELETE */}
         {popUpType === "delete" && (
           <div className="d-flex flex-column gap-3">
             <h4>Are you sure you want to delete this Expense?</h4>
@@ -224,11 +253,13 @@ function ExpensePopUp({
           </div>
         )}
 
+        {/* ADD */}
         {popUpType === "add" && (
           <div className="d-flex flex-column gap-3 align-items-start">
             <h2>Add Expense:</h2>
 
             <div className="d-flex flex-column gap-3">
+              {/* Name */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="name">Name</label>
 
@@ -244,8 +275,13 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !newExpense.name && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Category */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="category">Category</label>
 
@@ -268,6 +304,7 @@ function ExpensePopUp({
                 </select>
               </div>
 
+              {/* Amount */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="amount">Amount</label>
 
@@ -283,8 +320,13 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !newExpense.amount && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Date */}
               <div className="d-flex flex-column gap-1 align-items-start">
                 <label htmlFor="date">Date</label>
 
@@ -300,23 +342,37 @@ function ExpensePopUp({
                     })
                   }
                 />
+
+                {showError && !newExpense.date && (
+                  <small className="text-danger">This field is required</small>
+                )}
               </div>
 
+              {/* Buttons */}
               <div className="d-flex">
                 <button
                   style={{
                     backgroundColor: "var(--color-green)",
                     border: "1px solid var(--color-green)",
                   }}
-                  onClick={() =>
+                  onClick={() => {
+                    if (
+                      !newExpense.name ||
+                      !newExpense.amount ||
+                      !newExpense.date
+                    ) {
+                      setShowError(true);
+                      return;
+                    }
+
                     addExpense(
                       newExpense,
                       eventId,
                       setExpenses,
                       setShowPopUp,
                       setPopUpType,
-                    )
-                  }
+                    );
+                  }}
                 >
                   Add
                 </button>

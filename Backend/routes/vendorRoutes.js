@@ -10,14 +10,14 @@ const {
 
 const router = express.Router();
 
-router.get("/", getVendors);
+router.get("/:eventId", getVendors);
 
-router.get("/:id", getVendorById);
+router.get("/vendor/:id", getVendorById);
 
-router.post("/", createVendor);
+router.post("/:eventId", createVendor);
 
-router.put("/:id", updateVendor);
+router.put("/vendor/:id", updateVendor);
 
-router.delete("/:id", deleteVendor);
+router.delete("/vendor/:id", deleteVendor);
 
 module.exports = router;

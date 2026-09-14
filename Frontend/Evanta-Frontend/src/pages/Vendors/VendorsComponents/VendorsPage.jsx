@@ -1,69 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { useEvent } from "../../../context/EventContext";
 import Icon from "../../../components/Icons";
 import "../VendorsPage.css";
-
-const initialVendors = [
-  {
-    id: 1,
-    type: "Photographer",
-    name: "Ahmed Photography",
-    phone: "01012345678",
-    price: 3000,
-    date: "20 September 2026",
-    status: "Booked",
-    notes: "Outdoor photography",
-  },
-  {
-    id: 2,
-    type: "Decorator",
-    name: "Elegant Decor",
-    phone: "01123456789",
-    price: 4500,
-    date: "20 September 2026",
-    status: "Booked",
-    notes: "Engagement stage and flowers",
-  },
-  {
-    id: 3,
-    type: "Catering",
-    name: "Taste Catering",
-    phone: "01234567890",
-    price: 9500,
-    date: "20 September 2026",
-    status: "Booked",
-    notes: "100 guests",
-  },
-  {
-    id: 4,
-    type: "Venue",
-    name: "Banha Garden Hall",
-    phone: "01098765432",
-    price: 8500,
-    date: "20 September 2026",
-    status: "Booked",
-    notes: "Main hall",
-  },
-  {
-    id: 5,
-    type: "DJ",
-    name: "DJ Karim",
-    phone: "01199887766",
-    price: 2500,
-    date: "20 September 2026",
-    status: "Pending",
-    notes: "Sound system included",
-  },
-  {
-    id: 6,
-    type: "Makeup Artist",
-    name: "Mona Beauty",
-    phone: "01288776655",
-    price: 1800,
-    date: "20 September 2026",
-    status: "Pending",
-    notes: "Bridal makeup",
-  },
-];
 
 const vendorTypes = [
   "All",
@@ -87,12 +26,39 @@ const emptyForm = {
 };
 
 function VendorsPage() {
-  const [vendors, setVendors] = useState(initialVendors);
+  const [vendors, setVendors] = useState([]);
   const [activeType, setActiveType] = useState("All");
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(null);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [form, setForm] = useState(emptyForm);
+
+  const { currentEvent } = useEvent();
+  const eventId = currentEvent?._id;
+
+  useEffect(() => {
+    if (!eventId) {
+      setVendors([]);
+      return;
+    }
+
+    const fetchVendors = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/vendors/${eventId}`,
+        );
+
+        setVendors(response.data);
+      } catch (error) {
+        console.error(
+          "Error fetching vendors:",
+          error.response?.data || error.message,
+        );
+      }
+    };
+
+    fetchVendors();
+  }, [eventId]);
 
   const filteredVendors = useMemo(() => {
     return vendors.filter((vendor) => {
@@ -114,34 +80,66 @@ function VendorsPage() {
   ).length;
 
   function openAddVendor() {
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      date: currentEvent?.date
+        ? new Date(currentEvent.date).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : emptyForm.date,
+    });
+
     setModal("add");
   }
 
-  function saveVendor(event) {
+  async function saveVendor(event) {
     event.preventDefault();
+
+    if (!eventId) return;
 
     if (!form.name.trim() || !form.phone.trim() || !form.price) {
       return;
     }
 
-    const newVendor = {
-      ...form,
-      id: Date.now(),
-      price: Number(form.price),
-    };
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/vendors/${eventId}`,
+        {
+          ...form,
+          price: Number(form.price),
+        },
+      );
 
-    setVendors((current) => [...current, newVendor]);
-    setModal(null);
+      setVendors((current) => [...current, response.data.vendor]);
+
+      setModal(null);
+      setForm(emptyForm);
+    } catch (error) {
+      console.error(
+        "Error creating vendor:",
+        error.response?.data || error.message,
+      );
+    }
   }
 
-  function deleteVendor(id) {
+  async function deleteVendor(id) {
     const confirmed = window.confirm(
       "Are you sure you want to delete this vendor?",
     );
 
-    if (confirmed) {
-      setVendors((current) => current.filter((vendor) => vendor.id !== id));
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/api/vendors/vendor/${id}`);
+
+      setVendors((current) => current.filter((vendor) => vendor._id !== id));
+    } catch (error) {
+      console.error(
+        "Error deleting vendor:",
+        error.response?.data || error.message,
+      );
     }
   }
 
@@ -190,6 +188,7 @@ function VendorsPage() {
               className="primary-btn"
               type="button"
               onClick={openAddVendor}
+              disabled={!eventId}
             >
               <Icon name="plus" size={15} />
               Add Vendor
@@ -231,6 +230,7 @@ function VendorsPage() {
             <div className="toolbar">
               <div>
                 <strong>Vendor Cards</strong>
+
                 <span>
                   {filteredVendors.length}{" "}
                   {filteredVendors.length === 1 ? "result" : "results"}
@@ -261,10 +261,10 @@ function VendorsPage() {
               <div className="vendor-grid">
                 {filteredVendors.map((vendor) => (
                   <VendorCard
-                    key={vendor.id}
+                    key={vendor._id}
                     vendor={vendor}
                     onView={() => openDetails(vendor)}
-                    onDelete={() => deleteVendor(vendor.id)}
+                    onDelete={() => deleteVendor(vendor._id)}
                   />
                 ))}
               </div>

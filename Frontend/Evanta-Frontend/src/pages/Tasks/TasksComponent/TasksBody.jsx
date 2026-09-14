@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useEvent } from "../../../context/EventContext";
 
 import TasksHeader from "./TasksHeader";
 import TasksSummary from "./TasksSummary";
@@ -7,8 +8,8 @@ import TasksList from "./TasksList";
 import AddTaskModal from "./AddTaskModal";
 
 import "../tasks.css";
+
 const API_URL = "http://localhost:3000/api";
-const EVENT_ID = "507f1f77bcf86cd799439011";
 
 const emptyForm = {
   title: "",
@@ -27,10 +28,15 @@ function TasksBody() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
 
+  const { currentEvent } = useEvent();
+  const eventId = currentEvent?._id;
+
   // GET TASKS
   const fetchTasks = async () => {
+    if (!eventId) return;
+
     try {
-      const response = await fetch(`${API_URL}/events/${EVENT_ID}/tasks`);
+      const response = await fetch(`${API_URL}/events/${eventId}/tasks`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch tasks");
@@ -61,7 +67,7 @@ function TasksBody() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [eventId]);
 
   // FORM
   const handleInputChange = (e) => {
@@ -77,8 +83,10 @@ function TasksBody() {
   const handleAddTask = async (e) => {
     e.preventDefault();
 
+    if (!eventId) return;
+
     try {
-      const response = await fetch(`${API_URL}/events/${EVENT_ID}/tasks`, {
+      const response = await fetch(`${API_URL}/events/${eventId}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -253,8 +261,6 @@ function TasksBody() {
     <main className="tasks-page">
       <TasksHeader
         onAddTask={() => {
-          console.log("ADD TASK CLICKED");
-
           setEditingTaskId(null);
           setFormData(emptyForm);
           setShowModal(true);

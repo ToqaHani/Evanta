@@ -1,7 +1,11 @@
-const mongoose = require("mongoose");
-
 const vendorSchema = new mongoose.Schema(
   {
+    eventId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+      required: true,
+    },
+
     type: {
       type: String,
       required: [true, "Vendor type is required"],
@@ -48,7 +52,3 @@ const vendorSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-const Vendor = mongoose.model("Vendor", vendorSchema);
-
-module.exports = Vendor;

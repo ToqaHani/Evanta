@@ -14,7 +14,22 @@ const empty = {
 };
 
 export default function EventFormModal({ event, onClose, onSave }) {
-  const [form, setForm] = useState(event ? { ...event } : empty);
+  const [form, setForm] = useState(
+    event
+      ? {
+          eventType: EVENT_TYPES.includes(event.type) ? event.type : "Other",
+          customEventType: EVENT_TYPES.includes(event.type)
+            ? ""
+            : event.type || "",
+          eventName: event.name || "",
+          date: event.date ? event.date.slice(0, 10) : "",
+          time: event.time || "",
+          location: event.location || "",
+          expectedGuests: event.expectedGuests ?? "",
+          budget: event.budget ?? "",
+        }
+      : empty,
+  );
 
   const set = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -22,7 +37,7 @@ export default function EventFormModal({ event, onClose, onSave }) {
 
   const submit = (eventObject) => {
     eventObject.preventDefault();
-    onSave(form, event?.eventId);
+    onSave(form, event?._id);
   };
 
   return (
@@ -132,6 +147,7 @@ export default function EventFormModal({ event, onClose, onSave }) {
           >
             Cancel
           </button>
+
           <button type="submit" className="btn-evanta btn-evanta-solid">
             {event ? "Save Changes" : "Add Event"}
           </button>

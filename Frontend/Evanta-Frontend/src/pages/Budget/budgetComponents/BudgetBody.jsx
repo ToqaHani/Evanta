@@ -26,7 +26,7 @@ function BudgetBody() {
       try {
         const response = await axios.get(`${API_URL}/budget/${eventId}`);
 
-        setExpenses(response.data);
+        setExpenses(response.data.expenses || []);
       } catch (error) {
         console.error("Error fetching expenses:", error.response?.data);
       }

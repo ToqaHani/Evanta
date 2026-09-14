@@ -15,7 +15,9 @@ async function editExpense(
 
     setExpenses((prev) =>
       prev.map((expense) =>
-        expense._id === editedExpense._id ? response.data : expense,
+        expense._id === editedExpense._id
+          ? response.data.expense
+          : expense,
       ),
     );
 

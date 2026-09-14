@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../create-event.css";
 import { useEvent } from "../../../context/EventContext";
 import { addEvent, EVENT_TYPES } from "../../../components/My-Events/events";
-
+import { useNavigate } from "react-router-dom";
 const initial = {
   eventType: "",
   customEventType: "",
@@ -15,6 +15,7 @@ const initial = {
 };
 
 export default function CreateEvent() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(initial);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -41,6 +42,7 @@ export default function CreateEvent() {
 
       setForm(initial);
       setSuccess("Event created successfully.");
+      navigate("/smart-plan");
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -210,7 +212,15 @@ export default function CreateEvent() {
             )}
 
             <div className="create-event-actions">
-              <button type="button" className="btn-evanta btn-evanta-ghost">
+              <button
+                type="button"
+                className="btn-evanta btn-evanta-ghost"
+                onClick={() => {
+                  setForm(initial);
+                  setError("");
+                  setSuccess("");
+                }}
+              >
                 Cancel
               </button>
 
