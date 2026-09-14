@@ -9,6 +9,7 @@ const taskRoutes = require("./routes/taskRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const invitationsRoutes = require("./routes/invitationsRoutes");
 const dashboardRoutes = require("./routes/dashboard-routes/dashboardRoutes");
+const vendorRoutes = require("./routes/routes-vendors/vendorRoutes");
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.use("/api/guest", guestRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/budget", expenseRoutes);
 app.use("/api/invitations", invitationsRoutes);
+app.use("/api/vendors", vendorRoutes);
+
 connectDB();
 
 const port = 3000;
