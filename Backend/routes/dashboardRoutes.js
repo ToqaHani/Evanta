@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 
 const {
   getDashboard,
@@ -7,18 +8,7 @@ const {
   deleteDashboard,
 } = require("../controllers/dashboardController");
 
-const router = express.Router();
-
-// GET dashboard
+// GET dashboard data for a specific event
 router.get("/:eventId/dashboard", getDashboard);
-
-// CREATE dashboard
-router.post("/:eventId/dashboard", createDashboard);
-
-// UPDATE dashboard
-router.put("/:eventId/dashboard", updateDashboard);
-
-// DELETE dashboard
-router.delete("/:eventId/dashboard", deleteDashboard);
 
 module.exports = router;
