@@ -1,0 +1,81 @@
+:root {
+  --color-brown: #884a39;
+  --color-caramel: #c38154;
+  --color-peach: #ffc26f;
+  --color-cream: #f9e0bb;
+  --color-beige: #f8f3ea;
+  --color-white: #fdfaf5;
+  --color-dark-brown: #2b2522;
+
+  --color-green: #22c55e;
+  --color-orange: #f59e0b;
+  --color-red: #ef4444;
+}
+* {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: var(--color-beige);
+  color: var(--color-dark-brown);
+  font-weight: 600;
+}
+p {
+  font-weight: 600;
+  color: var(--color-brown);
+}
+div.content {
+  background-color: var(--color-white);
+  border-radius: 20px;
+  box-shadow: 0 0 10px var(--color-brown);
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+div.upload {
+  background-color: var(--color-beige);
+  border: 1px dashed var(--color-brown);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 300px;
+}
+button {
+  background-color: var(--color-brown);
+  color: var(--color-white);
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--color-brown);
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 600;
+}
+button.copied {
+  background-color: var(--color-green);
+  border: 1px solid var(--color-green);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  background-color: gray;
+  border: 1px solid gray;
+}
+button:enabled:hover {
+  opacity: 0.8;
+}
