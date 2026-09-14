@@ -1,22 +1,26 @@
-import { mockDashboard } from '../data/mockDashboard';
+const API_URL = "http://localhost:3000/api";
 
-
-export async function getDashboard(eventId = '123', { signal } = {}) {
-  const useMock = import.meta.env.VITE_USE_MOCK !== 'false';
-
-  if (useMock) {
-    await new Promise((resolve) => setTimeout(resolve, 350));
-    return { ...mockDashboard, event: { ...mockDashboard.event, id: eventId } };
+export const getDashboard = async (eventId) => {
+  if (!eventId) {
+    throw new Error("Event ID is required");
   }
 
-  const response = await fetch(`/api/events/${eventId}/dashboard`, {
-    headers: { Accept: 'application/json' },
-    signal
-  });
+  try {
+    const response = await fetch(
+      `${API_URL}/events/${eventId}/dashboard`
+    );
 
-  if (!response.ok) {
-    throw new Error(`Dashboard API returned ${response.status}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+
+      throw new Error(
+        errorData.message || "Failed to load dashboard data"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Dashboard API error:", error);
+    throw error;
   }
-
-  return response.json();
-}
+};
