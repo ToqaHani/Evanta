@@ -5,42 +5,48 @@ import InvitationQR from "./InvitationQR";
 import { useEvent } from "../../../context/EventContext";
 import axios from "axios";
 import "../invitations.css";
+
 function InvitationBody() {
-  // فايل الصورة علشان احطه في ال event invitation
-  let [imgFile, setImgFile] = useState(null);
-  let [imageUrl, setImageUrl] = useState(null);
-  let [invitationUrl, setInvitationUrl] = useState(null);
+  const [imgFile, setImgFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [invitationUrl, setInvitationUrl] = useState(null);
+
   const { currentEvent } = useEvent();
   const eventId = currentEvent?._id;
+
   async function handleUpload(file) {
     if (!eventId) return;
+
     const formData = new FormData();
     formData.append("invitationImage", file);
     formData.append(
       "invitationUrl",
       `http://localhost:5173/public-invitation/${eventId}`,
     );
+
     try {
       const response = await axios.post(
         `http://localhost:3000/api/invitations/${eventId}`,
         formData,
       );
+
       setImageUrl(response.data.invitation.imageUrl);
       setInvitationUrl(response.data.invitation.invitationUrl);
     } catch (err) {
       console.log(err.response?.data);
     }
   }
-  async function handleDelete() {
-    console.log("Current Event:", currentEvent);
-    console.log("Event ID:", eventId);
 
+  async function handleDelete() {
     if (!eventId) {
       console.log("No current event selected");
       return;
     }
+
     try {
-      await axios.delete(`http://localhost:3000/api/invitations/${eventId}`);
+      await axios.delete(
+        `http://localhost:3000/api/invitations/${eventId}`,
+      );
 
       setImgFile(null);
       setImageUrl(null);
@@ -49,13 +55,16 @@ function InvitationBody() {
       console.log(err.response?.data);
     }
   }
+
   useEffect(() => {
     if (!eventId) return;
+
     async function getInvitation() {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/invitations/${eventId}`,
         );
+
         setImageUrl(response.data.invitation.imageUrl);
         setInvitationUrl(response.data.invitation.invitationUrl);
       } catch (err) {
@@ -65,10 +74,12 @@ function InvitationBody() {
 
     getInvitation();
   }, [eventId]);
+
   return (
-    <>
+    <div className="invitations-page">
       <div className="container p-5">
         <h1 className="py-3">Invitations</h1>
+
         <div className="row g-3">
           <div className="col-lg-4 col-12">
             <InvitationImg
@@ -79,12 +90,14 @@ function InvitationBody() {
               imageUrl={imageUrl}
             />
           </div>
+
           <div className="col-lg-8 col-12 d-flex flex-column gap-3">
             <InvitationLink
               imgFile={imgFile}
               imageUrl={imageUrl}
               invitationUrl={invitationUrl}
             />
+
             <InvitationQR
               imgFile={imgFile}
               imageUrl={imageUrl}
@@ -93,7 +106,8 @@ function InvitationBody() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
+
 export default InvitationBody;
