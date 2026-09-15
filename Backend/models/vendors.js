@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const vendorSchema = new mongoose.Schema(
   {
     eventId: {
@@ -50,5 +51,5 @@ const vendorSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
