@@ -2,7 +2,9 @@
 
 * {
   font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
 }
+
 .guests-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -202,7 +204,9 @@
 /* Guest List */
 
 .guest-list {
-  position: relative;
+  width: 100%;
+  display: flex !important;
+  flex-direction: column !important;
   background: #ffffff;
   border: 1px solid #f0dfc8;
   border-radius: 14px;
@@ -211,8 +215,9 @@
 
 .guest-list-header,
 .guest-row {
-  display: grid;
-  grid-template-columns: 2fr 2fr 1.5fr 1.5fr 0.5fr;
+  width: 100%;
+  display: grid !important;
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr 0.5fr !important;
   align-items: center;
   gap: 15px;
   padding: 17px 20px;
@@ -223,7 +228,7 @@
   color: #5f463a;
   font-size: 13px;
   font-weight: 700;
-  border-radius: 14px 14px 0 0;
+  border-radius: 13px 13px 0 0;
   letter-spacing: 0.2px;
 }
 
@@ -234,6 +239,12 @@
   font-size: 14px;
   transition: 0.2s ease;
   min-height: 68px;
+  background: #ffffff;
+}
+
+.guest-row:last-child {
+  border-bottom-left-radius: 13px;
+  border-bottom-right-radius: 13px;
 }
 
 .guest-row:hover {
