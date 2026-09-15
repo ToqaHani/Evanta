@@ -215,15 +215,10 @@ export default function CreateEvent() {
               <button
                 type="button"
                 className="btn-evanta btn-evanta-ghost"
-                onClick={() => {
-                  setForm(initial);
-                  setError("");
-                  setSuccess("");
-                }}
+                onClick={() => navigate(-1)}
               >
                 Cancel
               </button>
-
               <button type="submit" className="btn-evanta btn-evanta-solid">
                 Create Event
               </button>
