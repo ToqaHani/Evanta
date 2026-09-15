@@ -51,5 +51,5 @@ const vendorSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
