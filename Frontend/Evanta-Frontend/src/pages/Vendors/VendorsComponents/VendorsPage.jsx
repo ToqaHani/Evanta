@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { useEvent } from "../../../context/EventContext";
-import Icon from "../../../components/Icons";
+import React, { useEffect, useMemo, useState } from "react";
 import "../VendorsPage.css";
 
-const vendorTypes = [
+const API_URL = "http://localhost:3000/api/vendors";
+
+const DEFAULT_CATEGORIES = [
   "All",
   "Photographer",
   "Decorator",
@@ -15,551 +14,846 @@ const vendorTypes = [
   "Other",
 ];
 
-const emptyForm = {
-  type: "Photographer",
+const emptyVendor = {
   name: "",
+  category: "Other",
   phone: "",
+  eventDate: "",
   price: "",
-  date: "20 September 2026",
   status: "Pending",
   notes: "",
 };
 
-function VendorsPage() {
-  const [vendors, setVendors] = useState([]);
-  const [activeType, setActiveType] = useState("All");
-  const [query, setQuery] = useState("");
-  const [modal, setModal] = useState(null);
-  const [selectedVendor, setSelectedVendor] = useState(null);
-  const [form, setForm] = useState(emptyForm);
+function BriefcaseIcon({ size = 24 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M3 11h18" />
+    </svg>
+  );
+}
 
-  const { currentEvent } = useEvent();
-  const eventId = currentEvent?._id;
+function ClockIcon({ size = 24 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+function CalendarIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M16 3v4M8 3v4M3 10h18" />
+    </svg>
+  );
+}
+
+function SearchIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+function TrashIcon({ size = 18 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 15H6L5 6" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
+  );
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatPrice(value) {
+  const number = Number(value);
+
+  if (!value || Number.isNaN(number)) return "—";
+
+  return number.toLocaleString("en-US");
+}
+
+function normalizeVendor(vendor) {
+  return {
+    ...vendor,
+    name:
+      vendor.name ||
+      vendor.vendorName ||
+      vendor.companyName ||
+      "Unnamed Vendor",
+
+    category:
+      vendor.category ||
+      vendor.type ||
+      vendor.vendorType ||
+      "Other",
+
+    phone:
+      vendor.phone ||
+      vendor.phoneNumber ||
+      vendor.contactNumber ||
+      "",
+
+    eventDate:
+      vendor.eventDate ||
+      vendor.date ||
+      vendor.bookingDate ||
+      "",
+
+    price:
+      vendor.price ??
+      vendor.cost ??
+      vendor.amount ??
+      0,
+
+    status:
+      vendor.status ||
+      vendor.bookingStatus ||
+      "Pending",
+
+    notes: vendor.notes || "",
+  };
+}
+
+export default function VendorsPage() {
+  const [vendors, setVendors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [search, setSearch] = useState("");
+
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [form, setForm] = useState(emptyVendor);
 
   useEffect(() => {
-    if (!eventId) {
-      setVendors([]);
-      return;
-    }
+    loadVendors();
+  }, []);
 
-    const fetchVendors = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:3000/api/vendors/${eventId}`,
-        );
+  async function loadVendors() {
+    try {
+      setLoading(true);
+      setError("");
 
-        setVendors(response.data);
-      } catch (error) {
-        console.error(
-          "Error fetching vendors:",
-          error.response?.data || error.message,
-        );
+      const response = await fetch(API_URL);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
-    };
 
-    fetchVendors();
-  }, [eventId]);
+      const result = await response.json();
+
+      const rawVendors = Array.isArray(result)
+        ? result
+        : Array.isArray(result.vendors)
+        ? result.vendors
+        : [];
+
+      setVendors(rawVendors.map(normalizeVendor));
+    } catch (err) {
+      console.error("Vendor loading error:", err);
+      setError("Could not load vendors.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const filteredVendors = useMemo(() => {
+    const q = search.trim().toLowerCase();
+
     return vendors.filter((vendor) => {
-      const matchesType = activeType === "All" || vendor.type === activeType;
+      const categoryMatches =
+        activeCategory === "All" ||
+        vendor.category?.toLowerCase() ===
+          activeCategory.toLowerCase();
 
-      const text =
-        `${vendor.name} ${vendor.type} ${vendor.phone}`.toLowerCase();
+      const searchMatches =
+        !q ||
+        vendor.name?.toLowerCase().includes(q) ||
+        vendor.category?.toLowerCase().includes(q) ||
+        vendor.phone?.toLowerCase().includes(q);
 
-      const matchesSearch = text.includes(query.toLowerCase());
-
-      return matchesType && matchesSearch;
+      return categoryMatches && searchMatches;
     });
-  }, [vendors, activeType, query]);
+  }, [vendors, activeCategory, search]);
 
-  const booked = vendors.filter((vendor) => vendor.status === "Booked").length;
+  const total = vendors.length;
+
+  const booked = vendors.filter(
+    (vendor) =>
+      vendor.status?.toLowerCase() === "booked"
+  ).length;
 
   const pending = vendors.filter(
-    (vendor) => vendor.status === "Pending",
+    (vendor) =>
+      vendor.status?.toLowerCase() === "pending"
   ).length;
 
   function openAddVendor() {
+    setEditingVendor(null);
+    setForm(emptyVendor);
+    setShowForm(true);
+  }
+
+  function openEditVendor(vendor) {
+    setEditingVendor(vendor);
+
     setForm({
-      ...emptyForm,
-      date: currentEvent?.date
-        ? new Date(currentEvent.date).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })
-        : emptyForm.date,
+      name: vendor.name || "",
+      category: vendor.category || "Other",
+      phone: vendor.phone || "",
+      eventDate: vendor.eventDate
+        ? vendor.eventDate.substring(0, 10)
+        : "",
+      price: vendor.price || "",
+      status: vendor.status || "Pending",
+      notes: vendor.notes || "",
     });
 
-    setModal("add");
+    setSelectedVendor(null);
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingVendor(null);
+    setForm(emptyVendor);
+  }
+
+  function changeForm(event) {
+    const { name, value } = event.target;
+
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
   }
 
   async function saveVendor(event) {
     event.preventDefault();
 
-    if (!eventId) return;
-
-    if (!form.name.trim() || !form.phone.trim() || !form.price) {
-      return;
-    }
-
     try {
-      const response = await axios.post(
-        `http://localhost:3000/api/vendors/${eventId}`,
+      const editingId =
+        editingVendor?._id || editingVendor?.id;
+
+      const response = await fetch(
+        editingVendor
+          ? `${API_URL}/${editingId}`
+          : API_URL,
         {
-          ...form,
-          price: Number(form.price),
-        },
+          method: editingVendor ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            price: Number(form.price || 0),
+          }),
+        }
       );
 
-      setVendors((current) => [...current, response.data.vendor]);
+      if (!response.ok) {
+        throw new Error("Unable to save vendor");
+      }
 
-      setModal(null);
-      setForm(emptyForm);
-    } catch (error) {
-      console.error(
-        "Error creating vendor:",
-        error.response?.data || error.message,
-      );
+      closeForm();
+      await loadVendors();
+    } catch (err) {
+      console.error(err);
+      alert("Unable to save vendor.");
     }
   }
 
-  async function deleteVendor(id) {
+  async function deleteVendor(vendor) {
+    const vendorId = vendor._id || vendor.id;
+
+    if (!vendorId) return;
+
     const confirmed = window.confirm(
-      "Are you sure you want to delete this vendor?",
+      `Delete ${vendor.name}?`
     );
 
     if (!confirmed) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/vendors/vendor/${id}`);
-
-      setVendors((current) => current.filter((vendor) => vendor._id !== id));
-    } catch (error) {
-      console.error(
-        "Error deleting vendor:",
-        error.response?.data || error.message,
+      const response = await fetch(
+        `${API_URL}/${vendorId}`,
+        {
+          method: "DELETE",
+        }
       );
+
+      if (!response.ok) {
+        throw new Error("Unable to delete vendor");
+      }
+
+      setSelectedVendor(null);
+      await loadVendors();
+    } catch (err) {
+      console.error(err);
+      alert("Unable to delete vendor.");
     }
   }
 
-  function openDetails(vendor) {
-    setSelectedVendor(vendor);
-    setModal("details");
-  }
-
   return (
-    <div className="app-shell">
-      <main className="main-content">
-        <header className="topbar">
-          <div className="breadcrumb">
+    <div className="vendors-screen">
+      <div className="vendors-content">
+        <div className="vendors-topbar">
+          <div className="vendors-breadcrumb">
             <span>Event</span>
             <b>/</b>
             <strong>Vendors</strong>
           </div>
-
-          <div className="top-actions">
-            <button
-              className="icon-btn"
-              type="button"
-              aria-label="Notifications"
-            >
-              <Icon name="bell" />
-            </button>
-
-            <button className="profile-btn" type="button">
-              <span className="avatar">A</span>
-              Ahmed
-            </button>
-          </div>
-        </header>
-
-        <section className="page">
-          <div className="page-heading">
-            <div>
-              <div className="section-kicker">EVENT SERVICES</div>
-
-              <h1>Vendors</h1>
-
-              <p>Manage all service providers for your active event.</p>
-            </div>
-
-            <button
-              className="primary-btn"
-              type="button"
-              onClick={openAddVendor}
-              disabled={!eventId}
-            >
-              <Icon name="plus" size={15} />
-              Add Vendor
-            </button>
-          </div>
-
-          <div className="type-row">
-            {vendorTypes.map((type) => (
-              <button
-                key={type}
-                type="button"
-                className={`type-chip ${activeType === type ? "active" : ""}`}
-                onClick={() => setActiveType(type)}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-
-          <div className="stats-grid">
-            <StatCard
-              icon="briefcase"
-              tone="brown"
-              label="Total Vendors"
-              value={vendors.length}
-            />
-
-            <StatCard icon="check" tone="green" label="Booked" value={booked} />
-
-            <StatCard
-              icon="clock"
-              tone="orange"
-              label="Pending"
-              value={pending}
-            />
-          </div>
-
-          <section className="vendor-panel">
-            <div className="toolbar">
-              <div>
-                <strong>Vendor Cards</strong>
-
-                <span>
-                  {filteredVendors.length}{" "}
-                  {filteredVendors.length === 1 ? "result" : "results"}
-                </span>
-              </div>
-
-              <div className="search-box">
-                <Icon name="search" size={15} />
-
-                <input
-                  type="search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search vendors..."
-                />
-              </div>
-            </div>
-
-            {filteredVendors.length === 0 ? (
-              <div className="empty">
-                <Icon name="briefcase" size={30} />
-
-                <h3>No vendors found</h3>
-
-                <p>Try another filter or add a new vendor.</p>
-              </div>
-            ) : (
-              <div className="vendor-grid">
-                {filteredVendors.map((vendor) => (
-                  <VendorCard
-                    key={vendor._id}
-                    vendor={vendor}
-                    onView={() => openDetails(vendor)}
-                    onDelete={() => deleteVendor(vendor._id)}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-        </section>
-      </main>
-
-      {modal === "details" && selectedVendor && (
-        <Modal title="Vendor Details" onClose={() => setModal(null)}>
-          <div className="detail-hero">
-            <div className="vendor-icon">
-              <Icon name="briefcase" />
-            </div>
-
-            <div>
-              <div className="section-kicker">{selectedVendor.type}</div>
-
-              <h2>{selectedVendor.name}</h2>
-
-              <Status status={selectedVendor.status} />
-            </div>
-          </div>
-
-          <div className="detail-grid">
-            <Detail label="Vendor Type" value={selectedVendor.type} />
-
-            <Detail label="Phone" value={selectedVendor.phone} />
-
-            <Detail
-              label="Price"
-              value={`${Number(selectedVendor.price).toLocaleString()} EGP`}
-            />
-
-            <Detail label="Service Date" value={selectedVendor.date} />
-          </div>
-
-          <div className="note-box">
-            <span>Notes</span>
-
-            <p>{selectedVendor.notes || "No notes added."}</p>
-          </div>
-        </Modal>
-      )}
-
-      {modal === "add" && (
-        <Modal title="Add Vendor" onClose={() => setModal(null)}>
-          <form className="vendor-form" onSubmit={saveVendor}>
-            <div className="form-grid">
-              <Field label="Type">
-                <select
-                  value={form.type}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      type: event.target.value,
-                    })
-                  }
-                >
-                  {vendorTypes
-                    .filter((type) => type !== "All")
-                    .map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                </select>
-              </Field>
-
-              <Field label="Name">
-                <input
-                  required
-                  value={form.name}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      name: event.target.value,
-                    })
-                  }
-                  placeholder="Vendor name"
-                />
-              </Field>
-
-              <Field label="Phone">
-                <input
-                  required
-                  value={form.phone}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      phone: event.target.value,
-                    })
-                  }
-                  placeholder="01xxxxxxxxx"
-                />
-              </Field>
-
-              <Field label="Price (EGP)">
-                <input
-                  required
-                  type="number"
-                  min="0"
-                  value={form.price}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      price: event.target.value,
-                    })
-                  }
-                  placeholder="0"
-                />
-              </Field>
-
-              <Field label="Service Date">
-                <input
-                  value={form.date}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      date: event.target.value,
-                    })
-                  }
-                />
-              </Field>
-
-              <Field label="Booking Status">
-                <select
-                  value={form.status}
-                  onChange={(event) =>
-                    setForm({
-                      ...form,
-                      status: event.target.value,
-                    })
-                  }
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Booked">Booked</option>
-                </select>
-              </Field>
-            </div>
-
-            <Field label="Notes">
-              <textarea
-                rows="3"
-                value={form.notes}
-                onChange={(event) =>
-                  setForm({
-                    ...form,
-                    notes: event.target.value,
-                  })
-                }
-                placeholder="Add notes..."
-              />
-            </Field>
-
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={() => setModal(null)}
-              >
-                Cancel
-              </button>
-
-              <button type="submit" className="primary-btn">
-                Save Vendor
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
-  );
-}
-
-function StatCard({ icon, tone, label, value }) {
-  return (
-    <div className="stat-card">
-      <div className={`stat-icon ${tone}`}>
-        <Icon name={icon} />
-      </div>
-
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-    </div>
-  );
-}
-
-function Status({ status }) {
-  return (
-    <span className={`status ${status.toLowerCase()}`}>
-      <i />
-      {status}
-    </span>
-  );
-}
-
-function Detail({ label, value }) {
-  return (
-    <div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function Field({ label, children }) {
-  return (
-    <label className="field">
-      <span>{label}</span>
-      {children}
-    </label>
-  );
-}
-
-function VendorCard({ vendor, onView, onDelete }) {
-  return (
-    <article className="vendor-card">
-      <div className="card-top">
-        <div className="vendor-icon">
-          <Icon name="briefcase" />
         </div>
 
-        <Status status={vendor.status} />
-      </div>
+        <section className="vendors-heading-row">
+          <div>
+            <div className="vendors-kicker">
+              EVENT SERVICES
+            </div>
 
-      <div className="section-kicker">{vendor.type}</div>
+            <h1>Vendors</h1>
 
-      <h3>{vendor.name}</h3>
-
-      <div className="meta">
-        <div>
-          <Icon name="phone" size={14} />
-          {vendor.phone}
-        </div>
-
-        <div>
-          <Icon name="calendar" size={14} />
-          {vendor.date}
-        </div>
-      </div>
-
-      <div className="price">
-        {Number(vendor.price).toLocaleString()} <small>EGP</small>
-      </div>
-
-      <div className="card-actions">
-        <button type="button" className="secondary-btn" onClick={onView}>
-          View Details
-          <Icon name="arrowRight" size={14} />
-        </button>
-
-        <button
-          type="button"
-          className="delete-btn"
-          onClick={onDelete}
-          aria-label={`Delete ${vendor.name}`}
-        >
-          <Icon name="trash" size={15} />
-        </button>
-      </div>
-    </article>
-  );
-}
-
-function Modal({ title, onClose, children }) {
-  return (
-    <div
-      className="modal-backdrop"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <div className="modal">
-        <div className="modal-head">
-          <h2>{title}</h2>
+            <p>
+              Manage all service providers for your active
+              event.
+            </p>
+          </div>
 
           <button
             type="button"
-            className="close-btn"
-            onClick={onClose}
-            aria-label="Close"
+            className="vendors-add-btn"
+            onClick={openAddVendor}
           >
-            ×
+            <span>＋</span>
+            Add Vendor
           </button>
+        </section>
+
+        <div className="vendors-filter-row">
+          {DEFAULT_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              type="button"
+              className={
+                activeCategory === category
+                  ? "vendors-filter active"
+                  : "vendors-filter"
+              }
+              onClick={() =>
+                setActiveCategory(category)
+              }
+            >
+              {category}
+            </button>
+          ))}
         </div>
 
-        {children}
+        <section className="vendors-stats">
+          <div className="vendors-stat-card">
+            <div className="vendors-stat-icon brown">
+              <BriefcaseIcon />
+            </div>
+
+            <div>
+              <span>Total Vendors</span>
+              <strong>{total}</strong>
+            </div>
+          </div>
+
+          <div className="vendors-stat-card">
+            <div className="vendors-stat-icon green">
+              <span className="vendors-check">✓</span>
+            </div>
+
+            <div>
+              <span>Booked</span>
+              <strong>{booked}</strong>
+            </div>
+          </div>
+
+          <div className="vendors-stat-card">
+            <div className="vendors-stat-icon orange">
+              <ClockIcon />
+            </div>
+
+            <div>
+              <span>Pending</span>
+              <strong>{pending}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section className="vendors-board">
+          <div className="vendors-board-header">
+            <div>
+              <h2>Vendor Cards</h2>
+
+              <span>
+                {filteredVendors.length} result
+                {filteredVendors.length === 1 ? "" : "s"}
+              </span>
+            </div>
+
+            <label className="vendors-search">
+              <SearchIcon />
+
+              <input
+                type="text"
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+                placeholder="Search vendors..."
+              />
+            </label>
+          </div>
+
+          {loading ? (
+            <div className="vendors-empty-state">
+              Loading vendors...
+            </div>
+          ) : error ? (
+            <div className="vendors-empty-state">
+              <h3>{error}</h3>
+
+              <button
+                type="button"
+                onClick={loadVendors}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredVendors.length === 0 ? (
+            <div className="vendors-empty-state">
+              <BriefcaseIcon size={44} />
+              <h3>No vendors found</h3>
+              <p>
+                Try another filter or add a new vendor.
+              </p>
+            </div>
+          ) : (
+            <div className="vendors-card-grid">
+              {filteredVendors.map((vendor) => {
+                const id =
+                  vendor._id ||
+                  vendor.id ||
+                  `${vendor.name}-${vendor.phone}`;
+
+                const isBooked =
+                  vendor.status?.toLowerCase() ===
+                  "booked";
+
+                return (
+                  <article
+                    className="vendors-card"
+                    key={id}
+                  >
+                    <div className="vendors-card-top">
+                      <div className="vendors-card-icon">
+                        <BriefcaseIcon />
+                      </div>
+
+                      <div
+                        className={
+                          isBooked
+                            ? "vendors-status booked"
+                            : "vendors-status pending"
+                        }
+                      >
+                        <i />
+                        {vendor.status || "Pending"}
+                      </div>
+                    </div>
+
+                    <div className="vendors-card-category">
+                      {vendor.category}
+                    </div>
+
+                    <h3>{vendor.name}</h3>
+
+                    <div className="vendors-card-meta">
+                      {vendor.phone && (
+                        <div className="vendors-phone">
+                          {vendor.phone}
+                        </div>
+                      )}
+
+                      <div>
+                        <CalendarIcon />
+                        <span>
+                          {formatDate(
+                            vendor.eventDate
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="vendors-card-price">
+                      <strong>
+                        {formatPrice(vendor.price)}
+                      </strong>
+
+                      {vendor.price ? <span>EGP</span> : null}
+                    </div>
+
+                    <div className="vendors-card-actions">
+                      <button
+                        type="button"
+                        className="vendors-view-btn"
+                        onClick={() =>
+                          setSelectedVendor(vendor)
+                        }
+                      >
+                        View Details
+                      </button>
+
+                      <button
+                        type="button"
+                        className="vendors-delete-btn"
+                        onClick={() =>
+                          deleteVendor(vendor)
+                        }
+                        aria-label="Delete vendor"
+                      >
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
+
+      {selectedVendor && (
+        <div
+          className="vendors-modal-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget
+            ) {
+              setSelectedVendor(null);
+            }
+          }}
+        >
+          <div className="vendors-modal">
+            <div className="vendors-modal-title">
+              <div>
+                <span>VENDOR DETAILS</span>
+                <h2>{selectedVendor.name}</h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedVendor(null)
+                }
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="vendors-detail-grid">
+              <div>
+                <span>Category</span>
+                <strong>
+                  {selectedVendor.category}
+                </strong>
+              </div>
+
+              <div>
+                <span>Status</span>
+                <strong>
+                  {selectedVendor.status}
+                </strong>
+              </div>
+
+              <div>
+                <span>Phone</span>
+                <strong>
+                  {selectedVendor.phone || "—"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Event Date</span>
+                <strong>
+                  {formatDate(
+                    selectedVendor.eventDate
+                  )}
+                </strong>
+              </div>
+
+              <div>
+                <span>Price</span>
+                <strong>
+                  {formatPrice(
+                    selectedVendor.price
+                  )}
+                  {selectedVendor.price
+                    ? " EGP"
+                    : ""}
+                </strong>
+              </div>
+            </div>
+
+            {selectedVendor.notes && (
+              <div className="vendors-notes">
+                <span>Notes</span>
+                <p>{selectedVendor.notes}</p>
+              </div>
+            )}
+
+            <div className="vendors-modal-actions">
+              <button
+                type="button"
+                className="vendors-cancel-btn"
+                onClick={() =>
+                  setSelectedVendor(null)
+                }
+              >
+                Close
+              </button>
+
+              <button
+                type="button"
+                className="vendors-add-btn"
+                onClick={() =>
+                  openEditVendor(selectedVendor)
+                }
+              >
+                Edit Vendor
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showForm && (
+        <div
+          className="vendors-modal-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget
+            ) {
+              closeForm();
+            }
+          }}
+        >
+          <div className="vendors-modal">
+            <div className="vendors-modal-title">
+              <div>
+                <span>
+                  {editingVendor
+                    ? "EDIT VENDOR"
+                    : "NEW VENDOR"}
+                </span>
+
+                <h2>
+                  {editingVendor
+                    ? "Edit Vendor"
+                    : "Add Vendor"}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeForm}
+              >
+                ×
+              </button>
+            </div>
+
+            <form
+              className="vendors-form"
+              onSubmit={saveVendor}
+            >
+              <div className="vendors-form-grid">
+                <label>
+                  <span>Vendor Name</span>
+                  <input
+                    required
+                    name="name"
+                    value={form.name}
+                    onChange={changeForm}
+                  />
+                </label>
+
+                <label>
+                  <span>Category</span>
+
+                  <select
+                    name="category"
+                    value={form.category}
+                    onChange={changeForm}
+                  >
+                    {DEFAULT_CATEGORIES
+                      .filter(
+                        (category) =>
+                          category !== "All"
+                      )
+                      .map((category) => (
+                        <option
+                          key={category}
+                          value={category}
+                        >
+                          {category}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span>Phone</span>
+                  <input
+                    name="phone"
+                    value={form.phone}
+                    onChange={changeForm}
+                  />
+                </label>
+
+                <label>
+                  <span>Event Date</span>
+                  <input
+                    type="date"
+                    name="eventDate"
+                    value={form.eventDate}
+                    onChange={changeForm}
+                  />
+                </label>
+
+                <label>
+                  <span>Price (EGP)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    name="price"
+                    value={form.price}
+                    onChange={changeForm}
+                  />
+                </label>
+
+                <label>
+                  <span>Status</span>
+
+                  <select
+                    name="status"
+                    value={form.status}
+                    onChange={changeForm}
+                  >
+                    <option value="Booked">
+                      Booked
+                    </option>
+                    <option value="Pending">
+                      Pending
+                    </option>
+                  </select>
+                </label>
+              </div>
+
+              <label className="vendors-notes-field">
+                <span>Notes</span>
+
+                <textarea
+                  rows="4"
+                  name="notes"
+                  value={form.notes}
+                  onChange={changeForm}
+                />
+              </label>
+
+              <div className="vendors-modal-actions">
+                <button
+                  type="button"
+                  className="vendors-cancel-btn"
+                  onClick={closeForm}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="vendors-add-btn"
+                >
+                  {editingVendor
+                    ? "Save Changes"
+                    : "Add Vendor"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default VendorsPage;
