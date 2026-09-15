@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { FaCircleCheck } from "react-icons/fa6";
-
+import '../Public-invitation.css';
 function Invitation() {
   const { eventId } = useParams();
 
@@ -10,7 +10,9 @@ function Invitation() {
   const [phoneError, setPhoneError] = useState("");
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState("Pending");
-  const [statusColor, setStatusColor] = useState("var(--color-dark-brown)");
+  const [statusColor, setStatusColor] = useState(
+    "var(--color-dark-brown)",
+  );
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ function Invitation() {
   }
 
   return (
-    <>
+    <div className="invitation-page">
       {showMessage && (
         <div className="page p-2">
           <div className="message">
@@ -93,7 +95,9 @@ function Invitation() {
         )}
 
         <div className="d-flex flex-column justify-content-center align-items-center p-3 gap-3">
-          <label htmlFor="phone">Please, Enter your phone number:</label>
+          <label htmlFor="phone">
+            Please, Enter your phone number:
+          </label>
 
           <input
             type="text"
@@ -110,7 +114,9 @@ function Invitation() {
                   value.length === 11 &&
                   !/^(010|011|012|015)\d{8}$/.test(value)
                 ) {
-                  setPhoneError("Please enter a valid Egyptian phone number.");
+                  setPhoneError(
+                    "Please enter a valid Egyptian phone number.",
+                  );
                 } else {
                   setPhoneError("");
                 }
@@ -119,7 +125,9 @@ function Invitation() {
           />
 
           {phoneError && (
-            <p style={{ color: "var(--color-red)" }}>{phoneError}</p>
+            <p style={{ color: "var(--color-red)" }}>
+              {phoneError}
+            </p>
           )}
         </div>
 
@@ -161,7 +169,7 @@ function Invitation() {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
