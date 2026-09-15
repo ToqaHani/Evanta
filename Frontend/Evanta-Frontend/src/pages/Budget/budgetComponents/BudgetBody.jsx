@@ -5,12 +5,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useEvent } from "../../../context/EventContext";
 import "../Budget.css";
+
 const API_URL = "http://localhost:3000/api";
+
 function BudgetBody() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [popUpType, setPopUpType] = useState("");
   const [expenses, setExpenses] = useState([]);
-
   const { currentEvent } = useEvent();
   const eventId = currentEvent?._id;
 
@@ -34,19 +35,14 @@ function BudgetBody() {
 
     fetchExpenses();
   }, [eventId]);
+
   return (
-    <>
+    <div className="budget-page">
       <div className="container p-5">
         <div className="d-flex align-items-center mb-3">
           <h1 className="py-3">Budget</h1>
 
-          <button
-            style={{
-              marginLeft: "auto",
-              marginRight: 0,
-            }}
-            onClick={handleAddExpense}
-          >
+          <button className="budget-add-button" onClick={handleAddExpense}>
             Add Expense
           </button>
         </div>
@@ -73,7 +69,7 @@ function BudgetBody() {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
